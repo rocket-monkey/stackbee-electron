@@ -1,12 +1,16 @@
 import colors from 'colors';
 import {
   exec,
-  addSlashes,
   createTaskDef,
   waitForTaskRun,
-} from '../shared/utils';
+} from '../../shared/utils';
+import { CLUSTER_NAME, TASK_DEFINITION } from './constants';
+
+const TASK_RUN_WAIT_TIMEOUT = 10000;
+const TASK_RUN_MAX_WAIT_INTERVALS = 20;
 
 export default (customers) => {
+
   // get a listing of all current clusters
   let clusterArns;
   const listClusterStr = exec('aws ecs list-clusters');
@@ -32,6 +36,7 @@ export default (customers) => {
     return false;
   }
 
+  // iterate over all customers
   customers.forEach((customer) => {
     if (!customerExistsInServices(customer)) {
       const domain = customer; // TODO: make sure a user has usable subdomain!

@@ -66,38 +66,25 @@
             "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
             "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
         },
-        "EFSNameTag": {
-            "Description": "The name of the EFS volume",
-            "Type": "String",
-            "MinLength": "1",
-            "Default": "myEFSvolume"
+        "VPC": {
+            "Type": "AWS::EC2::VPC::Id",
+            "Description": "The ID of the pre-created VPC"
         },
-        "CIDRVPC": {
-            "Description": "Enter the CIDR Range for your VPC",
-            "Type": "String",
-            "MinLength": "9",
-            "MaxLength": "18",
-            "Default": "10.10.0.0/16",
-            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-            "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+        "Subnet1ID": {
+            "Type": "AWS::EC2::Subnet::Id",
+            "Description": "The ID of the pre-created Subnet1"
         },
-        "CIDRSubnet1": {
-            "Description": "Enter the CIDR Range for your VPC",
-            "Type": "String",
-            "MinLength": "9",
-            "MaxLength": "18",
-            "Default": "10.10.1.0/24",
-            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-            "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+        "Subnet2ID": {
+            "Type": "AWS::EC2::Subnet::Id",
+            "Description": "The ID of the pre-created Subnet2"
         },
-        "CIDRSubnet2": {
-            "Description": "Enter the CIDR Range for your VPC",
-            "Type": "String",
-            "MinLength": "9",
-            "MaxLength": "18",
-            "Default": "10.10.2.0/24",
-            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-            "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+        "MountTargetSecurityGroupID": {
+            "Type": "AWS::EC2::SecurityGroup::Id",
+            "Description": "The ID of the pre-created MountTargetSecurityGroup"
+        },
+        "FileSystemID": {
+            "Description": "The ID of the pre-created EFS FileSystem",
+            "Type": "String"
         }
     },
     "Mappings": {
@@ -129,66 +116,6 @@
         }
     },
     "Resources": {
-        "VPC": {
-            "Type": "AWS::EC2::VPC",
-            "Properties": {
-                "CidrBlock": {
-                    "Ref": "CIDRVPC"
-                },
-                "EnableDnsSupport": true,
-                "EnableDnsHostnames": true,
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": "EFS-ECS Stackbee Owncloud VPC"
-                    }
-                ]
-            }
-        },
-        "Subnet1": {
-            "Type": "AWS::EC2::Subnet",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VPC"
-                },
-                "MapPublicIpOnLaunch": true,
-                "CidrBlock": {
-                    "Ref": "CIDRSubnet1"
-                },
-                "AvailabilityZone": {
-                    "Fn::Select": [
-                        "0",
-                        {
-                            "Fn::GetAZs": {
-                                "Ref": "AWS::Region"
-                            }
-                        }
-                    ]
-                }
-            }
-        },
-        "Subnet2": {
-            "Type": "AWS::EC2::Subnet",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VPC"
-                },
-                "MapPublicIpOnLaunch": true,
-                "CidrBlock": {
-                    "Ref": "CIDRSubnet2"
-                },
-                "AvailabilityZone": {
-                    "Fn::Select": [
-                        "1",
-                        {
-                            "Fn::GetAZs": {
-                                "Ref": "AWS::Region"
-                            }
-                        }
-                    ]
-                }
-            }
-        },
         "InternetGateway": {
             "Type": "AWS::EC2::InternetGateway",
             "Properties": {
@@ -217,91 +144,14 @@
                 }
             }
         },
-        "PublicRouteTable": {
-            "DependsOn": [
-                "VPC"
-            ],
-            "Type": "AWS::EC2::RouteTable",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VPC"
-                },
-                "Tags": [
-                    {
-                        "Key": "Application",
-                        "Value": {
-                            "Ref": "AWS::StackName"
-                        }
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Public"
-                    }
-                ]
-            }
-        },
-        "PublicRoute": {
-            "DependsOn": [
-                "PublicRouteTable",
-                "InternetGateway"
-            ],
-            "Type": "AWS::EC2::Route",
-            "Properties": {
-                "RouteTableId": {
-                    "Ref": "PublicRouteTable"
-                },
-                "DestinationCidrBlock": "0.0.0.0/0",
-                "GatewayId": {
-                    "Ref": "InternetGateway"
-                }
-            }
-        },
-        "PublicSubnetRouteTableAssociation": {
-            "DependsOn": [
-                "Subnet1",
-                "PublicRouteTable"
-            ],
-            "Type": "AWS::EC2::SubnetRouteTableAssociation",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "Subnet1"
-                },
-                "RouteTableId": {
-                    "Ref": "PublicRouteTable"
-                }
-            }
-        },
-        "PublicSubnetRouteTableAssociation2": {
-            "DependsOn": [
-                "Subnet2",
-                "PublicRouteTable"
-            ],
-            "Type": "AWS::EC2::SubnetRouteTableAssociation",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "Subnet2"
-                },
-                "RouteTableId": {
-                    "Ref": "PublicRouteTable"
-                }
-            }
-        },
         "InstanceSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
                 "VpcId": {
                     "Ref": "VPC"
                 },
-                "GroupDescription": "Enable SSH access via port 22",
+                "GroupDescription": "Enable HTTP access via port 80 (initially)",
                 "SecurityGroupIngress": [
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "22",
-                        "ToPort": "22",
-                        "CidrIp": {
-                            "Ref": "SSHLocation"
-                        }
-                    },
                     {
                         "IpProtocol": "tcp",
                         "FromPort": "80",
@@ -311,50 +161,18 @@
                 ]
             }
         },
-        "MountTargetSecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VPC"
-                },
-                "GroupDescription": "Security group for mount target",
-                "SecurityGroupIngress": [
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "2049",
-                        "ToPort": "2049",
-                        "CidrIp": {
-                            "Ref": "CIDRVPC"
-                        }
-                    }
-                ]
-            }
-        },
-        "FileSystem": {
-            "Type": "AWS::EFS::FileSystem",
-            "Properties": {
-                "FileSystemTags": [
-                    {
-                        "Key": "Name",
-                        "Value": {
-                            "Ref": "EFSNameTag"
-                        }
-                    }
-                ]
-            }
-        },
         "MountTarget": {
             "Type": "AWS::EFS::MountTarget",
             "Properties": {
                 "FileSystemId": {
-                    "Ref": "FileSystem"
+                    "Ref": "FileSystemID"
                 },
                 "SubnetId": {
-                    "Ref": "Subnet1"
+                    "Ref": "Subnet1ID"
                 },
                 "SecurityGroups": [
                     {
-                        "Ref": "MountTargetSecurityGroup"
+                        "Ref": "MountTargetSecurityGroupID"
                     }
                 ]
             }
@@ -363,14 +181,14 @@
             "Type": "AWS::EFS::MountTarget",
             "Properties": {
                 "FileSystemId": {
-                    "Ref": "FileSystem"
+                    "Ref": "FileSystemID"
                 },
                 "SubnetId": {
-                    "Ref": "Subnet2"
+                    "Ref": "Subnet2ID"
                 },
                 "SecurityGroups": [
                     {
-                        "Ref": "MountTargetSecurityGroup"
+                        "Ref": "MountTargetSecurityGroupID"
                     }
                 ]
             }
@@ -380,10 +198,10 @@
             "Properties": {
                 "Subnets": [
                     {
-                        "Ref": "Subnet1"
+                        "Ref": "Subnet1ID"
                     },
                     {
-                        "Ref": "Subnet2"
+                        "Ref": "Subnet2ID"
                     }
                 ],
                 "SecurityGroups": [
@@ -510,10 +328,10 @@
                 ],
                 "VPCZoneIdentifier": [
                     {
-                        "Ref": "Subnet1"
+                        "Ref": "Subnet1ID"
                     },
                     {
-                        "Ref": "Subnet2"
+                        "Ref": "Subnet2ID"
                     }
                 ],
                 "LaunchConfigurationName": {
@@ -685,7 +503,7 @@
                                 "mkdir /mnt/efs\n",
                                 "EFS_FILE_SYSTEM_ID=",
                                 {
-                                    "Ref": "FileSystem"
+                                    "Ref": "FileSystemID"
                                 },
                                 "\n",
                                 "DIR_SRC=$EC2_AVAIL_ZONE.$EFS_FILE_SYSTEM_ID.efs.$EC2_REGION.amazonaws.com\n",
@@ -811,12 +629,6 @@
             "Description": "Mount target ID",
             "Value": {
                 "Ref": "MountTarget"
-            }
-        },
-        "FileSystemID": {
-            "Description": "File system ID",
-            "Value": {
-                "Ref": "FileSystem"
             }
         }
     }

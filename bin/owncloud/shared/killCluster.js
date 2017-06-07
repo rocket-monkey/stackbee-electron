@@ -1,8 +1,8 @@
 import {
   exec,
-} from '../shared/utils';
+} from '../../shared/utils';
 
-export default (clusterName) => {
+export default (clusterName, stackName) => {
 
   // stop all running tasks of the cluster
   let killedTasks = 0;
@@ -47,5 +47,5 @@ export default (clusterName) => {
   console.log(`killed ${killedTaskDefs} task-definitions successfully! 💪`.green);
 
   // delete the empty cluster now trough cloud-formation!
-  exec(`aws cloudformation delete-stack --stack-name sb-owncloud`);
+  exec(`aws cloudformation delete-stack --stack-name ${stackName}`);
 };

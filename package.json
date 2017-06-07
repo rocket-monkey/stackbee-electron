@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "owncloud": "babel-node ./bin/owncloud/index.js"
+    "owncloud": "babel-node ./bin/owncloud/index.js",
+    "owncloud-create": "babel-node ./bin/owncloud/ecsCreate.js",
+    "owncloud-kill": "babel-node ./bin/owncloud/ecsKill.js"
   },
   "repository": {
     "type": "git",
