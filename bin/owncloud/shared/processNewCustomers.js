@@ -50,7 +50,13 @@ export default (customers) => {
       exec(
         `mysql -u ${user} -h ${host} -p${password} -e "CREATE DATABASE IF NOT EXISTS sb_${dbName}_owncloud CHARACTER SET utf8 COLLATE utf8_general_ci;"`
       );
-      console.log(`new database name: sb_${dbName}_owncloud 👊🏼`.green);
+      // exec(
+      //   `mysql -u ${user} -h ${host} -p${password} -e "CREATE USER ${dbName}_admin@'%' IDENTIFIED BY 'hpbQxD6A66k3'"`
+      // ); // TODO: generate pass and save it in the user record
+      // exec(
+      //   `mysql -u ${user} -h ${host} -p${password} -e "GRANT SELECT, INSERT, UPDATE, CREATE, DELETE ON sb_${dbName}_owncloud.* TO '${dbName}_admin'@'%'"`
+      // );
+      console.log(`new database name: sb_${dbName}_owncloud, user: ${dbName}_admin 👊🏼`.green);
 
       // create new service in this cluster
       const serviceRes = JSON.parse(exec(

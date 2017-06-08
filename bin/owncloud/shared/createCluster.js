@@ -1,3 +1,4 @@
+import colors from 'colors';
 import {
   exec,
   addSlashes,
@@ -51,7 +52,7 @@ export default (stackName) => {
     },
     {
       "ParameterKey": "InstanceType",
-      "ParameterValue": "t2.micro",
+      "ParameterValue": "t2.small",
       "UsePreviousValue": false
     },
     {
@@ -61,27 +62,27 @@ export default (stackName) => {
     },
     {
       "ParameterKey": "VPC",
-      "ParameterValue": "vpc-0bfc2c6c",
+      "ParameterValue": "vpc-54e13133",
       "UsePreviousValue": false
     },
     {
       "ParameterKey": "Subnet1ID",
-      "ParameterValue": "subnet-2864b961",
+      "ParameterValue": "subnet-3166bb78",
       "UsePreviousValue": false
     },
     {
       "ParameterKey": "Subnet2ID",
-      "ParameterValue": "subnet-d1c8da89",
+      "ParameterValue": "subnet-b2c9dbea",
       "UsePreviousValue": false
     },
     {
       "ParameterKey": "MountTargetSecurityGroupID",
-      "ParameterValue": "sg-192c3860",
+      "ParameterValue": "sg-7fd4c006",
       "UsePreviousValue": false
     },
     {
       "ParameterKey": "FileSystemID",
-      "ParameterValue": "fs-c40ec60d",
+      "ParameterValue": "fs-900ec659",
       "UsePreviousValue": false
     }
   ];

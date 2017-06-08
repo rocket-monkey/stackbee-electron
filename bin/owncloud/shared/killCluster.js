@@ -1,3 +1,4 @@
+import colors from 'colors';
 import {
   exec,
 } from '../../shared/utils';
