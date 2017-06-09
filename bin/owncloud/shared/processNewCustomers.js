@@ -43,6 +43,11 @@ export default (users, callback) => {
 
   // iterate over all users
   console.log(`Processing ${users.length} new users..`.blue);
+
+  if (users.length === 0) {
+    return callback();
+  }
+
   users.forEach((user) => {
     const customer = user.name;
     const customerService = customerExistsInServices(customer);
@@ -122,10 +127,10 @@ export default (users, callback) => {
 
                 user.save((err, user) => {
                   if (err) { return console.log('Could not save user!', err); }
-                  console.log(`User updated with serviceArn "${customerService}"`.green);
+                  console.log(`User updated with serviceArn "${user.ecsOwncloudServiceArn}"`.green);
+                  callback();
                 });
 
-                callback();
               });
             });
 
