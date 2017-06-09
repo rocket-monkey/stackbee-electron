@@ -7,7 +7,8 @@ import User from '../shared/schema/user';
 
 connectDb();
 User.find({ 'ecsOwncloudServiceArn': { $exists: false } }, (error, users) => {
-  processNewCustomers(users);
+  processNewCustomers(users, () => {
+    mongoose.connection.close();
+  });
 
-  mongoose.connection.close();
 });

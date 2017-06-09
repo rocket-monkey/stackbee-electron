@@ -4,13 +4,17 @@ import {
   exec,
   createTaskDef,
   waitForTaskRun,
+  addSlashes,
 } from '../../shared/utils';
-import { CLUSTER_NAME, TASK_DEFINITION } from './constants';
+import {
+  CLUSTER_NAME,
+  TASK_DEFINITION,
+  SECURITY_GROUP_ID,
+  LOAD_BALANCER_NAME,
+  SSL_CERT_ID,
+ } from './constants';
 
-const TASK_RUN_WAIT_TIMEOUT = 10000;
-const TASK_RUN_MAX_WAIT_INTERVALS = 20;
-
-export default (users) => {
+export default (users, callback) => {
 
   // get a listing of all current clusters
   let clusterArns;
@@ -43,74 +47,95 @@ export default (users) => {
     const customer = user.name;
     const customerService = customerExistsInServices(customer);
     if (customerService === false) {
-      const domain = customer; // TODO: make sure a user has usable subdomain!
-      createTaskDef(customer, domain);
 
-      // create new database on RDS for this new owncloud installation
-      const mysqlUser = 'sbmaria';
-      const mysqlPw = 'iqk2fJAKY744';
-      const host = 'sb-maria-prod.cfwyrgfxdbjd.eu-west-1.rds.amazonaws.com';
-      const dbName = `sb_${domain.replace(/-/i, '_')}_owncloud`;
-      const dbUser = `${dbName}_admin`;
-      const dbPassword = Math.random().toString(36).slice(-8);
-      exec(
-        `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "CREATE DATABASE IF NOT EXISTS ${dbName} CHARACTER SET utf8 COLLATE utf8_general_ci;"`
-      );
-      try {
+      const domain = createTaskDef(user);
+      if (domain) {
+
+        // create new database on RDS for this new owncloud installation
+        const mysqlUser = 'sbmaria';
+        const mysqlPw = 'iqk2fJAKY744';
+        const host = 'sb-maria-prod.cfwyrgfxdbjd.eu-west-1.rds.amazonaws.com';
+        const dbName = `sb_${domain.replace(/-/i, '_')}_owncloud`;
+        const dbUser = `${dbName}_admin`;
+        const dbPassword = Math.random().toString(36).slice(-8);
         exec(
-          `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "DROP USER ${dbUser}@'%'"`
+          `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "CREATE DATABASE IF NOT EXISTS ${dbName} CHARACTER SET utf8 COLLATE utf8_general_ci;"`
         );
-      } catch (e) {
-        // ignore
-      }
-      exec(
-        `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "CREATE USER ${dbUser}@'%' IDENTIFIED BY '${dbPassword}'"`
-      );
-      exec(
-        `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "GRANT SELECT, INSERT, UPDATE, CREATE, DELETE ON ${dbName}.* TO '${dbUser}'@'%'"`
-      );
-      console.log(`new database name: ${dbName}, user: ${dbUser} 👊`.green);
-
-      user.owncloudDbName = dbName;
-      user.owncloudDbUser = dbUser;
-      user.owncloudDbPassword = dbPassword;
-
-      // create new service in this cluster
-      const serviceRes = JSON.parse(exec(
-        `aws ecs create-service --cluster ${CLUSTER_NAME} --service-name ${customer}-owncloud --task-definition ${customer}-owncloud --desired-count 1`
-      ));
-
-      if (serviceRes.service.status === 'ACTIVE') {
-        console.log(`service "sb-${customer}-owncloud" successfully created! 🚚`.green);
-        user.ecsOwncloudServiceArn = serviceRes.service.serviceArn;
-
-        // run new task in this service
-        const taskRes = JSON.parse(exec(`aws ecs run-task --cluster ${CLUSTER_NAME} --task-definition ${customer}-owncloud`));
-        console.log('taskRes', taskRes);
-        taskRes.tasks.forEach((task) => {
-          console.log(task);
-          console.log(task.containers);
-          if (task.lastStatus === 'PENDING') {
-
-            // wait for the task to become ACTIVE
-            waitForTaskRun(task, (describeTaskRes) => {
-              console.log(describeTaskRes);
-              console.log('task successfully started! 🎉'.green);
-
-              // update Route 53 DNS with the new custom port and the subdomain of the customer to point to his new owncloud instance
-              // TODO: impelment this shit
-            });
-          }
-        });
-
-        if (taskRes.taskDefinition.status === 'ACTIVE') {
-          console.log(`task-definition successfully created! 📦`.green);
-        } else {
-          console.log('❗️ could not run task in the new service ❗️'.red);
+        try {
+          exec(
+            `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "DROP USER ${dbUser}@'%'"`
+          );
+        } catch (e) {
+          // ignore
         }
+        exec(
+          `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "CREATE USER ${dbUser}@'%' IDENTIFIED BY '${dbPassword}'"`
+        );
+        exec(
+          `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "GRANT SELECT, INSERT, UPDATE, CREATE, DELETE ON ${dbName}.* TO '${dbUser}'@'%'"`
+        );
+        console.log(`new database name: ${dbName}, user: ${dbUser} 👊`.green);
 
+        user.owncloudDbName = dbName;
+        user.owncloudDbUser = dbUser;
+        user.owncloudDbPassword = dbPassword;
+
+        // create new service in this cluster
+        const serviceRes = JSON.parse(exec(
+          `aws ecs create-service --cluster ${CLUSTER_NAME} --service-name ${customer}-owncloud --task-definition ${customer}-owncloud --desired-count 1`
+        ));
+
+        if (serviceRes.service.status === 'ACTIVE') {
+          console.log(`service "sb-${customer}-owncloud" successfully created! 🚚`.green);
+          user.ecsOwncloudServiceArn = serviceRes.service.serviceArn;
+
+          // run new task in this service
+          try {
+            exec(`aws ecs run-task --cluster ${CLUSTER_NAME} --task-definition ${customer}-owncloud --group service:${customer}-owncloud`);
+          } catch (e) {
+            // ignore
+          }
+
+          setTimeout(() => {
+            const taskListRes = JSON.parse(exec(`aws ecs list-tasks --cluster ${CLUSTER_NAME} --service ${customer}-owncloud`));
+            taskListRes.taskArns.forEach((taskArn) => {
+              waitForTaskRun(taskArn, (describeTaskRes) => {
+                console.log('task successfully started! 🎉'.green);
+
+                // update EC2 security-group and load-balancer to enable access for the new port on "stackbee.cloud"
+                exec(`aws ec2 authorize-security-group-ingress --group-id ${SECURITY_GROUP_ID} --protocol tcp --port ${user.owncloudPort} --cidr 0.0.0.0/0`);
+
+                try {
+                  const listeners = [
+                    {
+                      "Protocol": "HTTPS",
+                      "LoadBalancerPort": user.owncloudPort,
+                      "InstanceProtocol": "HTTP",
+                      "InstancePort": user.owncloudPort,
+                      "SSLCertificateId": SSL_CERT_ID
+                    }
+                  ];
+                  exec(`aws elb create-load-balancer-listeners --load-balancer-name ${LOAD_BALANCER_NAME} --listeners "${addSlashes(JSON.stringify(listeners))}"`);
+                } catch (e) {
+                  // ignore
+                }
+
+                user.save((err, user) => {
+                  if (err) { return console.log('Could not save user!', err); }
+                  console.log(`User updated with serviceArn "${customerService}"`.green);
+                });
+
+                callback();
+              });
+            });
+
+          }, 8000);
+        } else {
+          console.log('❗️ could not create service in the cluster ❗️'.red);
+          callback();
+        }
       } else {
-        console.log('❗️ could not create service in the cluster ❗️'.red);
+        callback();
       }
     } else {
       user.ecsOwncloudServiceArn = customerService;
@@ -118,6 +143,7 @@ export default (users) => {
         if (err) { return console.log('Could not save user!', err); }
         console.log(`User updated with serviceArn "${customerService}"`.green);
       });
+      callback();
     }
   });
 

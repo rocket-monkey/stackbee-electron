@@ -1,5 +1,9 @@
 import colors from 'colors';
 import mongoose from 'mongoose';
+import { CLUSTER_NAME } from '../owncloud/shared/constants';
+
+const TASK_RUN_WAIT_TIMEOUT = 1000;
+const TASK_RUN_MAX_WAIT_INTERVALS = 20;
 
 const execSync = require('child_process').execSync;
 
@@ -58,26 +62,33 @@ export const createTaskDef = (user) => {
 
   if (taskRes.taskDefinition.status === 'ACTIVE') {
     console.log(`task def successfully updated! 🎉`.blue);
+    return domain;
   }
+
+  return null;
 };
 
-export const waitForTaskRun = (task, callback) => {
-  let intervals = 0;
+let intervals = 0;
+export const waitForTaskRun = (taskArn, callback) => {
   setTimeout(() => {
     intervals++;
     if (intervals >= TASK_RUN_MAX_WAIT_INTERVALS) {
       console.log(`waiting for task-run exceeded max-wait-intervals of ${TASK_RUN_MAX_WAIT_INTERVALS} 😢`.red);
+      intervals = 0;
+      callback();
       return;
     }
 
     const describeTaskRes = JSON.parse(exec(
-      `aws ecs describe-tasks --cluster ${CLUSTER_NAME} --tasks ${task.taskArn}"`
+      `aws ecs describe-tasks --cluster ${CLUSTER_NAME} --tasks ${taskArn}`
     ));
-    console.log(describeTaskRes);
-    if (describeTaskRes.lastStatus === 'ACTIVE') {
-      callback(describeTaskRes);
-    } else if (describeTaskRes.lastStatus === 'PENDING') {
-      waitForTaskRun(task);
+
+    const task = describeTaskRes.tasks.pop();
+    if (task.lastStatus === 'RUNNING') {
+      intervals = 0;
+      callback(task);
+    } else if (task.lastStatus === 'PENDING') {
+      waitForTaskRun(taskArn);
     }
   }, TASK_RUN_WAIT_TIMEOUT);
 };
