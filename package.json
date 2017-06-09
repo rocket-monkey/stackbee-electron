@@ -2,12 +2,14 @@
   "name": "hgo-manager",
   "version": "0.0.1",
   "description": "Scripts for the managing server of stackbee.io",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "owncloud": "babel-node ./bin/owncloud/index.js",
-    "owncloud-create": "babel-node ./bin/owncloud/ecsCreate.js",
-    "owncloud-kill": "babel-node ./bin/owncloud/ecsKill.js"
+    "start": "babel-node app.js",
+    "oc": "babel-node ./bin/owncloud/index.js",
+    "oc-create": "babel-node ./bin/owncloud/ecsCreate.js",
+    "oc-kill": "babel-node ./bin/owncloud/ecsKill.js",
+    "oc-new-user": "babel-node ./bin/owncloud/newUser.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,8 @@
     "babel-core": "^6.24.1",
     "babel-polyfill": "^6.23.0",
     "babel-preset-es2015": "^6.24.1",
-    "colors": "^1.1.2"
+    "colors": "^1.1.2",
+    "express": "^4.15.3",
+    "mongoose": "^4.10.5"
   }
 }

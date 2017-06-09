@@ -1,4 +1,5 @@
 import colors from 'colors';
+import User from '../../shared/schema/user';
 import {
   exec,
   createTaskDef,
@@ -9,7 +10,7 @@ import { CLUSTER_NAME, TASK_DEFINITION } from './constants';
 const TASK_RUN_WAIT_TIMEOUT = 10000;
 const TASK_RUN_MAX_WAIT_INTERVALS = 20;
 
-export default (customers) => {
+export default (users) => {
 
   // get a listing of all current clusters
   let clusterArns;
@@ -29,45 +30,62 @@ export default (customers) => {
   const customerExistsInServices = (customer) => {
     for (let i = 0, len = servicesArns.length; i < len; i += 1) {
       if (servicesArns[i].includes(customer, 1)) {
-        return true;
+        return servicesArns[i];
       }
     }
 
     return false;
   }
 
-  // iterate over all customers
-  customers.forEach((customer) => {
-    if (!customerExistsInServices(customer)) {
+  // iterate over all users
+  console.log(`Processing ${users.length} new users..`.blue);
+  users.forEach((user) => {
+    const customer = user.name;
+    const customerService = customerExistsInServices(customer);
+    if (customerService === false) {
       const domain = customer; // TODO: make sure a user has usable subdomain!
       createTaskDef(customer, domain);
 
       // create new database on RDS for this new owncloud installation
-      const user = 'sbmaria';
-      const password = 'iqk2fJAKY744';
-      const host = 'sb-maria.cfwyrgfxdbjd.eu-west-1.rds.amazonaws.com';
-      const dbName = domain.replace(/-/i, '_');
+      const mysqlUser = 'sbmaria';
+      const mysqlPw = 'iqk2fJAKY744';
+      const host = 'sb-maria-prod.cfwyrgfxdbjd.eu-west-1.rds.amazonaws.com';
+      const dbName = `sb_${domain.replace(/-/i, '_')}_owncloud`;
+      const dbUser = `${dbName}_admin`;
+      const dbPassword = Math.random().toString(36).slice(-8);
       exec(
-        `mysql -u ${user} -h ${host} -p${password} -e "CREATE DATABASE IF NOT EXISTS sb_${dbName}_owncloud CHARACTER SET utf8 COLLATE utf8_general_ci;"`
+        `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "CREATE DATABASE IF NOT EXISTS ${dbName} CHARACTER SET utf8 COLLATE utf8_general_ci;"`
       );
-      // exec(
-      //   `mysql -u ${user} -h ${host} -p${password} -e "CREATE USER ${dbName}_admin@'%' IDENTIFIED BY 'hpbQxD6A66k3'"`
-      // ); // TODO: generate pass and save it in the user record
-      // exec(
-      //   `mysql -u ${user} -h ${host} -p${password} -e "GRANT SELECT, INSERT, UPDATE, CREATE, DELETE ON sb_${dbName}_owncloud.* TO '${dbName}_admin'@'%'"`
-      // );
-      console.log(`new database name: sb_${dbName}_owncloud, user: ${dbName}_admin 👊🏼`.green);
+      try {
+        exec(
+          `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "DROP USER ${dbUser}@'%'"`
+        );
+      } catch (e) {
+        // ignore
+      }
+      exec(
+        `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "CREATE USER ${dbUser}@'%' IDENTIFIED BY '${dbPassword}'"`
+      );
+      exec(
+        `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "GRANT SELECT, INSERT, UPDATE, CREATE, DELETE ON ${dbName}.* TO '${dbUser}'@'%'"`
+      );
+      console.log(`new database name: ${dbName}, user: ${dbUser} 👊`.green);
+
+      user.owncloudDbName = dbName;
+      user.owncloudDbUser = dbUser;
+      user.owncloudDbPassword = dbPassword;
 
       // create new service in this cluster
       const serviceRes = JSON.parse(exec(
-        `aws ecs create-service --cluster ${CLUSTER_NAME} --service-name ${customer}-owncloud --task-definition sb-owncloud-${customer} --desired-count 1`
+        `aws ecs create-service --cluster ${CLUSTER_NAME} --service-name ${customer}-owncloud --task-definition ${customer}-owncloud --desired-count 1`
       ));
 
       if (serviceRes.service.status === 'ACTIVE') {
         console.log(`service "sb-${customer}-owncloud" successfully created! 🚚`.green);
+        user.ecsOwncloudServiceArn = serviceRes.service.serviceArn;
 
         // run new task in this service
-        const taskRes = JSON.parse(exec(`aws ecs run-task --cluster ${CLUSTER_NAME} --task-definition sb-owncloud-${customer} --group service:${customer}-owncloud`));
+        const taskRes = JSON.parse(exec(`aws ecs run-task --cluster ${CLUSTER_NAME} --task-definition ${customer}-owncloud`));
         console.log('taskRes', taskRes);
         taskRes.tasks.forEach((task) => {
           console.log(task);
@@ -94,11 +112,17 @@ export default (customers) => {
       } else {
         console.log('❗️ could not create service in the cluster ❗️'.red);
       }
+    } else {
+      user.ecsOwncloudServiceArn = customerService;
+      user.save((err, user) => {
+        if (err) { return console.log('Could not save user!', err); }
+        console.log(`User updated with serviceArn "${customerService}"`.green);
+      });
     }
   });
 
   // if (clusterArns.length > 0) {
-  //   customers.forEach((customer) => {
+  //   users.forEach((customer) => {
   //     let alreadyCreated = false;
   //     for (let i = 0, len = clusterArns.length; i < len; i += 1) {
   //       if (clusterArns[i].includes(customer, 1)) {

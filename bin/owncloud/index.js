@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 
+import mongoose from 'mongoose';
 import processNewCustomers from './shared/processNewCustomers';
+import { connectDb } from '../shared/utils';
+import User from '../shared/schema/user';
 
-// TODO: implement a database connection here -> flag already processed ones so we can do a cronjob out of it (which only processes new ones all 5mins)
-const customers = ['siska'];
+connectDb();
+User.find({ 'ecsOwncloudServiceArn': { $exists: false } }, (error, users) => {
+  processNewCustomers(users);
 
-processNewCustomers(customers);
+  mongoose.connection.close();
+});
