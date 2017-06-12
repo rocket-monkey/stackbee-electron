@@ -1,6 +1,5 @@
 import colors from 'colors';
 import mongoose from 'mongoose';
-import { CLUSTER_NAME } from '../owncloud/shared/constants';
 
 const TASK_RUN_WAIT_TIMEOUT = 1000;
 const TASK_RUN_MAX_WAIT_INTERVALS = 20;
@@ -19,6 +18,16 @@ export const addSlashes = (str) => (
   (str + '').replace(/[\\"']/g, '\\$&').replace(/\  u0000/g, '\\0')
 );
 
+export const findArg = (argName) => {
+  for (let i = 0, len = process.argv.length; i < len; i += 1) {
+    if (process.argv[i].indexOf(argName) > -1) {
+      return process.argv[i].split('=')[1];
+    }
+  }
+
+  return null;
+}
+
 export const createTaskDef = (user) => {
   const customer = user.name;
   const domain = customer; // TODO: make sure a user has usable subdomain!
@@ -35,7 +44,7 @@ export const createTaskDef = (user) => {
   const definition = [
     {
       'name': `sb-${customer}-owncloud`,
-      'image': 'owncloud',
+      'image': 'stackbeeio/owncloud',
       'cpu': 10,
       'memory': 500,
       'mountPoints': [
@@ -51,6 +60,9 @@ export const createTaskDef = (user) => {
           'containerPort': 80,
           'protocol': 'tcp'
         }
+      ],
+      'environment' : [
+        { 'name' : 'CUSTOMER_DOMAIN', 'value' : domain }
       ],
       'essential': true
     }
@@ -69,7 +81,7 @@ export const createTaskDef = (user) => {
 };
 
 let intervals = 0;
-export const waitForTaskRun = (taskArn, callback) => {
+export const waitForTaskRun = (clusterName, taskArn, callback) => {
   setTimeout(() => {
     intervals++;
     if (intervals >= TASK_RUN_MAX_WAIT_INTERVALS) {
@@ -80,7 +92,7 @@ export const waitForTaskRun = (taskArn, callback) => {
     }
 
     const describeTaskRes = JSON.parse(exec(
-      `aws ecs describe-tasks --cluster ${CLUSTER_NAME} --tasks ${taskArn}`
+      `aws ecs describe-tasks --cluster ${clusterName} --tasks ${taskArn}`
     ));
 
     const task = describeTaskRes.tasks.pop();
@@ -88,7 +100,7 @@ export const waitForTaskRun = (taskArn, callback) => {
       intervals = 0;
       callback(task);
     } else if (task.lastStatus === 'PENDING') {
-      waitForTaskRun(taskArn);
+      waitForTaskRun(clusterName, taskArn, callback);
     }
   }, TASK_RUN_WAIT_TIMEOUT);
 };

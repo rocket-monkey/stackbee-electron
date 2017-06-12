@@ -6,10 +6,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "babel-node app.js",
+    "compile": "babel -d lib/ src/",
+    "sbm-install": "npm install -g",
+    "sbm": "./index.js",
     "oc": "babel-node ./bin/owncloud/index.js",
     "oc-create": "babel-node ./bin/owncloud/ecsCreate.js",
     "oc-kill": "babel-node ./bin/owncloud/ecsKill.js",
-    "oc-new-user": "babel-node ./bin/owncloud/newUser.js"
+    "oc-new-user": "babel-node ./bin/owncloud/newUser.js",
+    "docker-build": "yarn run compile && docker build -t stackbeeio/node-manager .",
+    "docker-push": "docker push stackbeeio/node-manager",
+    "postinstall": "npm run compile"
+  },
+  "bin": {
+    "sbm": "./index.js"
   },
   "repository": {
     "type": "git",

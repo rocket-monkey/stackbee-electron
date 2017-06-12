@@ -1,4 +1,8 @@
+
+import fs from 'fs';
 import colors from 'colors';
+import mongoose from 'mongoose';
+import { connectDb } from '../../shared/utils';
 import User from '../../shared/schema/user';
 import {
   exec,
@@ -7,14 +11,51 @@ import {
   addSlashes,
 } from '../../shared/utils';
 import {
-  CLUSTER_NAME,
-  TASK_DEFINITION,
-  SECURITY_GROUP_ID,
-  LOAD_BALANCER_NAME,
-  SSL_CERT_ID,
- } from './constants';
+  OWNCLOUD_CLUSTER_NAME,
+  OWNCLOUD_SECURITY_GROUP_ID,
+  OWNCLOUD_LOAD_BALANCER_NAME,
+  OWNCLOUD_SSL_CERT_ID,
+} from '../../shared/constants';
 
-export default (users, callback) => {
+const writeConfigFileS3 = (user, domain) => {
+  const content = `<?php
+$AUTOCONFIG = array(
+  "dbtype"        => "mysql",
+  "dbname"        => "${user.owncloudDbName}",
+  "dbuser"        => "${user.owncloudDbUser}",
+  "dbpass"        => "${user.owncloudDbPassword}",
+  "dbhost"        => "${user.owncloudDbHost}",
+  "dbtableprefix" => "oc_",
+  "directory"     => "/efs/data",
+);
+  `;
+
+  fs.writeFile(`./s3_config/${domain}.config.php`, content, (err) => {
+    if (err) {
+      return console.log(err);
+    }
+
+    const res = exec(
+      `aws s3 cp --region eu-west-1 ./s3_config/${domain}.config.php s3://sb-owncloud-config/${domain}.config.php`
+    );
+    console.log(res);
+
+    console.log('Config file saved!'.green);
+  });
+};
+
+export const processNewOcUsers = (users, callback) => {
+  connectDb();
+  // TODO: and check if the user actually has the owncloud module!
+  User.find({ 'ecsOwncloudServiceArn': { $exists: false } }, (error, users) => {
+    processUsers(users, () => {
+      mongoose.connection.close();
+    });
+
+  });
+};
+
+const processUsers = (users, callback) => {
 
   // get a listing of all current clusters
   let clusterArns;
@@ -25,7 +66,7 @@ export default (users, callback) => {
   }
 
   let servicesArns;
-  const listServicesStr = exec(`aws ecs list-services --cluster ${CLUSTER_NAME}`);
+  const listServicesStr = exec(`aws ecs list-services --cluster ${OWNCLOUD_CLUSTER_NAME}`);
   if (listServicesStr && typeof listServicesStr === 'string') {
     const listServicesJson = JSON.parse(listServicesStr);
     servicesArns = listServicesJson.serviceArns;
@@ -41,7 +82,7 @@ export default (users, callback) => {
     return false;
   }
 
-  // iterate over all users
+  // iterate over all new users
   console.log(`Processing ${users.length} new users..`.blue);
 
   if (users.length === 0) {
@@ -87,7 +128,7 @@ export default (users, callback) => {
 
         // create new service in this cluster
         const serviceRes = JSON.parse(exec(
-          `aws ecs create-service --cluster ${CLUSTER_NAME} --service-name ${customer}-owncloud --task-definition ${customer}-owncloud --desired-count 1`
+          `aws ecs create-service --cluster ${OWNCLOUD_CLUSTER_NAME} --service-name ${customer}-owncloud --task-definition ${customer}-owncloud --desired-count 1`
         ));
 
         if (serviceRes.service.status === 'ACTIVE') {
@@ -96,19 +137,19 @@ export default (users, callback) => {
 
           // run new task in this service
           try {
-            exec(`aws ecs run-task --cluster ${CLUSTER_NAME} --task-definition ${customer}-owncloud --group service:${customer}-owncloud`);
+            exec(`aws ecs run-task --cluster ${OWNCLOUD_CLUSTER_NAME} --task-definition ${customer}-owncloud --group service:${customer}-owncloud`);
           } catch (e) {
             // ignore
           }
 
           setTimeout(() => {
-            const taskListRes = JSON.parse(exec(`aws ecs list-tasks --cluster ${CLUSTER_NAME} --service ${customer}-owncloud`));
+            const taskListRes = JSON.parse(exec(`aws ecs list-tasks --cluster ${OWNCLOUD_CLUSTER_NAME} --service ${customer}-owncloud`));
             taskListRes.taskArns.forEach((taskArn) => {
-              waitForTaskRun(taskArn, (describeTaskRes) => {
+              waitForTaskRun(OWNCLOUD_CLUSTER_NAME, taskArn, (describeTaskRes) => {
                 console.log('task successfully started! 🎉'.green);
 
                 // update EC2 security-group and load-balancer to enable access for the new port on "stackbee.cloud"
-                exec(`aws ec2 authorize-security-group-ingress --group-id ${SECURITY_GROUP_ID} --protocol tcp --port ${user.owncloudPort} --cidr 0.0.0.0/0`);
+                exec(`aws ec2 authorize-security-group-ingress --group-id ${OWNCLOUD_SECURITY_GROUP_ID} --protocol tcp --port ${user.owncloudPort} --cidr 0.0.0.0/0`);
 
                 try {
                   const listeners = [
@@ -117,10 +158,10 @@ export default (users, callback) => {
                       "LoadBalancerPort": user.owncloudPort,
                       "InstanceProtocol": "HTTP",
                       "InstancePort": user.owncloudPort,
-                      "SSLCertificateId": SSL_CERT_ID
+                      "SSLCertificateId": OWNCLOUD_SSL_CERT_ID
                     }
                   ];
-                  exec(`aws elb create-load-balancer-listeners --load-balancer-name ${LOAD_BALANCER_NAME} --listeners "${addSlashes(JSON.stringify(listeners))}"`);
+                  exec(`aws elb create-load-balancer-listeners --load-balancer-name ${OWNCLOUD_LOAD_BALANCER_NAME} --listeners "${addSlashes(JSON.stringify(listeners))}"`);
                 } catch (e) {
                   // ignore
                 }
@@ -151,60 +192,4 @@ export default (users, callback) => {
       callback();
     }
   });
-
-  // if (clusterArns.length > 0) {
-  //   users.forEach((customer) => {
-  //     let alreadyCreated = false;
-  //     for (let i = 0, len = clusterArns.length; i < len; i += 1) {
-  //       if (clusterArns[i].includes(customer, 1)) {
-  //         alreadyCreated = true;
-
-  //         console.log(`cluster for customer "${customer}" already created! 🎉`.blue);
-
-  //         break;
-  //       }
-  //     }
-
-  //     if (!alreadyCreated) {
-
-  //       // create new owncloud cluster for this customer
-  //       const clusterRes = JSON.parse(exec(`aws ecs create-cluster --cluster-name sb-${customer}-owncloud`));
-
-  //       if (clusterRes.cluster.status === 'ACTIVE') {
-  //         console.log(`cluster "sb-${customer}-owncloud" successfully created! 🚀`.green);
-
-  //         // create new service in this cluster
-  //         const serviceRes = JSON.parse(exec(
-  //           `aws ecs create-service --cluster sb-${customer}-owncloud --service-name ${customer}-owncloud --task-definition ${TASK_DEFINITION} --desired-count 1`
-  //         ));
-
-  //         if (serviceRes.service.status === 'ACTIVE') {
-  //           console.log(`service "sb-${customer}-owncloud" successfully created! 🚚`.green);
-
-  //           // register new EC2 container instance
-  //           // const instanceRes = JSON.parse(exec(`aws ecs register-container-instance --cluster sb-${customer}-owncloud`));
-  //           // console.log(instanceRes);
-
-  //           // run new task in this service
-  //           // const taskRes = JSON.parse(exec(`aws ecs run-task --cluster sb-${customer}-owncloud --task-definition ${TASK_DEFINITION}`));
-  //           // console.log(taskRes);
-
-  //           // if (taskRes.taskDefinition.status === 'ACTIVE') {
-  //           //   console.log(`task-definition successfully created! 📦`.green);
-  //           // } else {
-  //           //   console.log('❗️ could not create task-definition in the new service ❗️'.red);
-  //           // }
-
-  //         } else {
-  //           console.log('❗️ could not create the service in the new cluster ❗️'.red);
-  //         }
-  //       } else {
-  //         console.log('❗️ could not create new cluster ❗️'.red);
-  //       }
-  //     }
-  //   });
-
-  // } else {
-  //   console.log('❗️ could not get listing of clusters ❗️'.red);
-  // }
 };

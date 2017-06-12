@@ -1,23 +1,14 @@
-#!/usr/bin/env node
-
 import mongoose from 'mongoose';
-import processNewCustomers from './shared/processNewCustomers';
-import { connectDb } from '../shared/utils';
-import User from '../shared/schema/user';
+import { connectDb } from '../../shared/utils';
+import User from '../../shared/schema/user';
 
-if (process.argv.length < 4) {
-  console.log('please enter user and email, two arguments..'.red);
-} else {
-  const name = process.argv[2];
-  const email = process.argv[3];
-
+export const createUser = (name, domain, email) => {
   connectDb();
 
-  const domain = name;
   console.log('start creating user', name);
   User
     .find()
-    .sort({ 'owncloudPort': -1 })
+    .sort({ 'owncloudPort': 1 })
     .exec((error, users) => {
       let owncloudPort = 1080;
       if (users.length > 0) {
@@ -37,4 +28,8 @@ if (process.argv.length < 4) {
         console.log(`User "${name}" created`.green);
       });
     });
-}
+};
+
+export const killUser = (email) => {
+  console.log('TODO'.red);
+};

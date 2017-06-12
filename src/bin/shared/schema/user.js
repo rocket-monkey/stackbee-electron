@@ -13,6 +13,7 @@ const userSchema = new Schema({
   owncloudDbName        : { type: String, required: false },
   owncloudDbUser        : { type: String, required: false },
   owncloudDbPassword    : { type: String, required: false },
+  owncloudRoute         : { type: String, required: false },
   ecsOwncloudServiceArn : { type: String, required: false },
   roles                 : { type: Array, default: ['user'] },
   provider              : { type: Object, default: {} },
