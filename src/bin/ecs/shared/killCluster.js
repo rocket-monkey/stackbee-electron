@@ -2,12 +2,12 @@ import colors from 'colors';
 import {
   exec,
   addSlashes,
-} from '../../shared/utils';
+} from '../../../shared/utils';
 import {
   NODEJS_STACK_NAME,
   OWNCLOUD_STACK_NAME,
   OWNCLOUD_CLUSTER_NAME,
-} from '../../shared/constants';
+} from '../../../shared/constants';
 
 export const killEcsOwncloud = () => {
 
@@ -59,5 +59,9 @@ export const killEcsOwncloud = () => {
 };
 
 export const killEcsNodejs = () => {
+  console.log('TODO'.red);
+}
+
+export const killEcsNginx = () => {
   console.log('TODO'.red);
 }

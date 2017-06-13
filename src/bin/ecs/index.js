@@ -1,12 +1,14 @@
 import colors from 'colors';
-import { findArg } from '../shared/utils';
+import { findArg } from '../../shared/utils';
 import {
   startEcsNodejs,
+  startEcsNginx,
   startEcsOwncloud,
   startEcsOwncloudDeps,
 } from './shared/createCluster';
 import {
   killEcsNodejs,
+  killEcsNginx,
   killEcsOwncloud,
 } from './shared/killCluster';
 
@@ -27,6 +29,8 @@ export default () => {
         startEcsOwncloud();
       } else if (name === 'nodejs' || name === 'node') {
         startEcsNodejs();
+      } else if (name === 'nginx') {
+        startEcsNginx();
       } else {
         console.log('unknown name entered, possible values are: owncloud-deps (oc-deps), owncloud (oc), nodejs (node) 👍'.blue);
       }
@@ -37,6 +41,8 @@ export default () => {
         killEcsOwncloud();
       } else if (name === 'nodejs' || name === 'node') {
         killEcsNodejs();
+      } else if (name === 'nginx') {
+        killEcsNginx();
       } else {
         console.log('unknown name entered, possible values are: owncloud (oc), nodejs (node) 👍'.blue);
       }

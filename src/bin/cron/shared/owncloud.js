@@ -2,52 +2,25 @@
 import fs from 'fs';
 import colors from 'colors';
 import mongoose from 'mongoose';
-import { connectDb } from '../../shared/utils';
-import User from '../../shared/schema/user';
+import { connectDb } from '../../../shared/db';
+import User from '../../../shared/db/schema/user';
 import {
   exec,
   createTaskDef,
   waitForTaskRun,
   addSlashes,
-} from '../../shared/utils';
+} from '../../../shared/utils';
 import {
   OWNCLOUD_CLUSTER_NAME,
   OWNCLOUD_SECURITY_GROUP_ID,
   OWNCLOUD_LOAD_BALANCER_NAME,
   OWNCLOUD_SSL_CERT_ID,
-} from '../../shared/constants';
-
-const writeConfigFileS3 = (user, domain) => {
-  const content = `<?php
-$AUTOCONFIG = array(
-  "dbtype"        => "mysql",
-  "dbname"        => "${user.owncloudDbName}",
-  "dbuser"        => "${user.owncloudDbUser}",
-  "dbpass"        => "${user.owncloudDbPassword}",
-  "dbhost"        => "${user.owncloudDbHost}",
-  "dbtableprefix" => "oc_",
-  "directory"     => "/efs/data",
-);
-  `;
-
-  fs.writeFile(`./s3_config/${domain}.config.php`, content, (err) => {
-    if (err) {
-      return console.log(err);
-    }
-
-    const res = exec(
-      `aws s3 cp --region eu-west-1 ./s3_config/${domain}.config.php s3://sb-owncloud-config/${domain}.config.php`
-    );
-    console.log(res);
-
-    console.log('Config file saved!'.green);
-  });
-};
+} from '../../../shared/constants';
 
 export const processNewOcUsers = (users, callback) => {
   connectDb();
   // TODO: and check if the user actually has the owncloud module!
-  User.find({ 'ecsOwncloudServiceArn': { $exists: false } }, (error, users) => {
+  User.find({ 'owncloudMeta.ecsOwncloudServiceArn': { $exists: false } }, (error, users) => {
     processUsers(users, () => {
       mongoose.connection.close();
     });
@@ -122,9 +95,9 @@ const processUsers = (users, callback) => {
         );
         console.log(`new database name: ${dbName}, user: ${dbUser} 👊`.green);
 
-        user.owncloudDbName = dbName;
-        user.owncloudDbUser = dbUser;
-        user.owncloudDbPassword = dbPassword;
+        user.owncloudMeta.owncloudDbName = dbName;
+        user.owncloudMeta.owncloudDbUser = dbUser;
+        user.owncloudMeta.owncloudDbPassword = dbPassword;
 
         // create new service in this cluster
         const serviceRes = JSON.parse(exec(
@@ -133,7 +106,7 @@ const processUsers = (users, callback) => {
 
         if (serviceRes.service.status === 'ACTIVE') {
           console.log(`service "sb-${customer}-owncloud" successfully created! 🚚`.green);
-          user.ecsOwncloudServiceArn = serviceRes.service.serviceArn;
+          user.owncloudMeta.ecsOwncloudServiceArn = serviceRes.service.serviceArn;
 
           // run new task in this service
           try {
@@ -149,15 +122,15 @@ const processUsers = (users, callback) => {
                 console.log('task successfully started! 🎉'.green);
 
                 // update EC2 security-group and load-balancer to enable access for the new port on "stackbee.cloud"
-                exec(`aws ec2 authorize-security-group-ingress --group-id ${OWNCLOUD_SECURITY_GROUP_ID} --protocol tcp --port ${user.owncloudPort} --cidr 0.0.0.0/0`);
+                exec(`aws ec2 authorize-security-group-ingress --group-id ${OWNCLOUD_SECURITY_GROUP_ID} --protocol tcp --port ${user.owncloudMeta.owncloudPort} --cidr 0.0.0.0/0`);
 
                 try {
                   const listeners = [
                     {
                       "Protocol": "HTTPS",
-                      "LoadBalancerPort": user.owncloudPort,
+                      "LoadBalancerPort": user.owncloudMeta.owncloudPort,
                       "InstanceProtocol": "HTTP",
-                      "InstancePort": user.owncloudPort,
+                      "InstancePort": user.owncloudMeta.owncloudPort,
                       "SSLCertificateId": OWNCLOUD_SSL_CERT_ID
                     }
                   ];
@@ -168,7 +141,7 @@ const processUsers = (users, callback) => {
 
                 user.save((err, user) => {
                   if (err) { return console.log('Could not save user!', err); }
-                  console.log(`User updated with serviceArn "${user.ecsOwncloudServiceArn}"`.green);
+                  console.log(`User updated with serviceArn "${user.owncloudMeta.ecsOwncloudServiceArn}"`.green);
                   callback();
                 });
 
@@ -184,7 +157,7 @@ const processUsers = (users, callback) => {
         callback();
       }
     } else {
-      user.ecsOwncloudServiceArn = customerService;
+      user.owncloudMeta.ecsOwncloudServiceArn = customerService;
       user.save((err, user) => {
         if (err) { return console.log('Could not save user!', err); }
         console.log(`User updated with serviceArn "${customerService}"`.green);

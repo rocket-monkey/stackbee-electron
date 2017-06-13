@@ -103,7 +103,7 @@
     "ECSCluster":{
       "Type":"AWS::ECS::Cluster",
       "Properties": {
-        "ClusterName": "ecs-sb-nodejs"
+        "ClusterName": "ecs-sb-nginx"
       }
     },
     "EcsSecurityGroup": {
@@ -112,7 +112,7 @@
             "VpcId": {
                 "Ref": "VPC"
             },
-            "GroupDescription": "Enable HTTP access via port 80 for node manager",
+            "GroupDescription": "Enable HTTP access via port 80 for nginx",
             "SecurityGroupIngress": [
                 {
                     "IpProtocol": "tcp",
@@ -150,17 +150,17 @@
               {
                 "Ref":"AWS::StackName"
               },
-              "-ecs-nodejs-app"
+              "-ecs-nginx-app"
             ]
           ]
         },
         "ContainerDefinitions":[
           {
-            "Name":"nodejs-app",
-            "Cpu":"50",
+            "Name":"nginx-app",
+            "Cpu":"25",
             "Essential":"true",
-            "Image":"stackbeeio/node-manager:latest",
-            "Memory":"500",
+            "Image":"stackbeeio/nginx:latest",
+            "Memory":"250",
             "LogConfiguration":{
               "LogDriver":"awslogs",
               "Options":{
@@ -170,13 +170,13 @@
                 "awslogs-region":{
                   "Ref":"AWS::Region"
                 },
-                "awslogs-stream-prefix":"ecs-nodejs-app"
+                "awslogs-stream-prefix":"ecs-nginx-app"
               }
             },
             "PortMappings":[
               {
                 "HostPort": 80,
-                "ContainerPort":3000
+                "ContainerPort":80
               }
             ]
           }
@@ -186,7 +186,7 @@
     "ECSALB":{
       "Type":"AWS::ElasticLoadBalancingV2::LoadBalancer",
       "Properties":{
-        "Name":"nodejs-elb",
+        "Name":"nginx-elb",
         "Scheme":"internet-facing",
         "LoadBalancerAttributes":[
           {
@@ -263,7 +263,7 @@
         "HealthCheckProtocol":"HTTP",
         "HealthCheckTimeoutSeconds":5,
         "HealthyThresholdCount":2,
-        "Name":"nodejs-tg",
+        "Name":"nginx-tg",
         "Port":80,
         "Protocol":"HTTP",
         "UnhealthyThresholdCount":2,
@@ -370,8 +370,8 @@
         "DesiredCount":"1",
         "LoadBalancers":[
           {
-            "ContainerName":"nodejs-app",
-            "ContainerPort":"3000",
+            "ContainerName":"nginx-app",
+            "ContainerPort":"80",
             "TargetGroupArn":{
               "Ref":"ECSTG"
             }

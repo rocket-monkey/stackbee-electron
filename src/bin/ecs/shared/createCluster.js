@@ -2,11 +2,12 @@ import colors from 'colors';
 import {
   exec,
   addSlashes,
-} from '../../shared/utils';
+} from '../../../shared/utils';
 import {
+  NGINX_STACK_NAME,
   NODEJS_STACK_NAME,
   OWNCLOUD_STACK_NAME,
-} from '../../shared/constants';
+} from '../../../shared/constants';
 
 export const startEcsOwncloudDeps = () => {
 
@@ -140,6 +141,51 @@ export const startEcsNodejs = () => {
     },
   ];
   exec(`aws cloudformation create-stack --stack-name ${NODEJS_STACK_NAME} --capabilities CAPABILITY_IAM --template-url ${templateUrl} --parameters "${addSlashes(JSON.stringify(params))}"`);
+};
+
+export const startEcsNginx = () => {
+
+  const deps = getDeps();
+
+  const templateUrl = 'https://s3-eu-west-1.amazonaws.com/stackbee-cloudformation/nginx-ecs.json';
+  const params = [
+    {
+      "ParameterKey": "KeyName",
+      "ParameterValue": "stackbee-nginx",
+      "UsePreviousValue": false
+    },
+    {
+      "ParameterKey": "DesiredCapacity",
+      "ParameterValue": "1",
+      "UsePreviousValue": false
+    },
+    {
+      "ParameterKey": "MaxSize",
+      "ParameterValue": "1000",
+      "UsePreviousValue": false
+    },
+    {
+      "ParameterKey": "InstanceType",
+      "ParameterValue": "t2.micro",
+      "UsePreviousValue": false
+    },
+    {
+      "ParameterKey": "VPC",
+      "ParameterValue": deps.VPCID,
+      "UsePreviousValue": false
+    },
+    {
+      "ParameterKey": "Subnet1ID",
+      "ParameterValue": deps.Subnet1ID,
+      "UsePreviousValue": false
+    },
+    {
+      "ParameterKey": "Subnet2ID",
+      "ParameterValue": deps.Subnet2ID,
+      "UsePreviousValue": false
+    },
+  ];
+  exec(`aws cloudformation create-stack --stack-name ${NGINX_STACK_NAME} --capabilities CAPABILITY_IAM --template-url ${templateUrl} --parameters "${addSlashes(JSON.stringify(params))}"`);
 };
 
 const getDeps = () => {

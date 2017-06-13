@@ -1,5 +1,5 @@
 import colors from 'colors';
-import { findArg } from '../shared/utils';
+import { findArg } from '../../shared/utils';
 import {
   processNewOcUsers,
 } from './shared/owncloud';

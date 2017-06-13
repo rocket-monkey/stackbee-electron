@@ -1,5 +1,5 @@
 import colors from 'colors';
-import printManual from './shared/printManual';
+import printManual from '../shared/printManual';
 import ecsService from './ecs/index';
 import sbusrService from './sbusr/index';
 import cronService from './cron/index';

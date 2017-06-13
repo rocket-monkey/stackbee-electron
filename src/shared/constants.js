@@ -7,3 +7,6 @@ export const OWNCLOUD_SSL_CERT_ID = 'arn:aws:acm:eu-west-1:895860557897:certific
 
 export const NODEJS_STACK_NAME = 'sb-nodejs';
 export const NODEJS_CLUSTER_NAME = 'ecs-sb-nodejs';
+
+export const NGINX_STACK_NAME = 'sb-nginx';
+export const NGINX_CLUSTER_NAME = 'ecs-sb-nginx';
