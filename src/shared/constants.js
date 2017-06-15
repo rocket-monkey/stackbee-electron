@@ -1,3 +1,5 @@
+export const RDS_PROD_DATABASE = 'sb-maria-prod.cfwyrgfxdbjd.eu-west-1.rds.amazonaws.com';
+
 export const OWNCLOUD_STACK_NAME = 'sb-owncloud';
 export const OWNCLOUD_CLUSTER_NAME = 'ecs-sb-owncloud';
 export const OWNCLOUD_TASK_DEFINITION = 'stackbee-owncloud';
@@ -10,3 +12,4 @@ export const NODEJS_CLUSTER_NAME = 'ecs-sb-nodejs';
 
 export const NGINX_STACK_NAME = 'sb-nginx';
 export const NGINX_CLUSTER_NAME = 'ecs-sb-nginx';
+

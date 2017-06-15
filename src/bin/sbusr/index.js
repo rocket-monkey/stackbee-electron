@@ -24,7 +24,16 @@ export default () => {
       if (!domain) {
         return console.log('no "domain=<domain>" given to sbm sbusr create command ❗️'.red);
       }
-      createUser(name, domain, email);
+      let modules = findArg('modules=');
+      console.log('modules', modules);
+      if (modules) {
+        modules = modules.indexOf(',') > -1 ? modules.split(',') : [modules];
+      } else {
+        console.log('no "modules=" param given - using ["owncloud"] as default modules param!'.yellow);
+        modules = ['owncloud']; // default
+      }
+
+      createUser(name, domain, email, modules);
       break;
 
     case 'kill':
