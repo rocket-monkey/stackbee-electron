@@ -112,12 +112,12 @@
             "VpcId": {
                 "Ref": "VPC"
             },
-            "GroupDescription": "Enable HTTP access via port 80 for nginx",
+            "GroupDescription": "Enable HTTP access via port 443 for nginx",
             "SecurityGroupIngress": [
                 {
                     "IpProtocol": "tcp",
-                    "FromPort": "80",
-                    "ToPort": "80",
+                    "FromPort": "443",
+                    "ToPort": "443",
                     "CidrIp": "0.0.0.0/0"
                 }
             ]
@@ -175,8 +175,12 @@
             },
             "PortMappings":[
               {
+                "HostPort": 443,
+                "ContainerPort": 443
+              },
+              {
                 "HostPort": 80,
-                "ContainerPort":80
+                "ContainerPort": 80
               }
             ]
           }
@@ -224,8 +228,11 @@
         "LoadBalancerArn":{
           "Ref":"ECSALB"
         },
-        "Port":"80",
-        "Protocol":"HTTP"
+        "Port":"443",
+        "Protocol":"HTTPS",
+        "Certificates": [{
+          "CertificateArn": "arn:aws:acm:eu-west-1:895860557897:certificate/7bceb1d6-18f1-492b-b0fb-e02bba16ea16"
+        }]
       }
     },
     "ECSALBListenerRule":{
@@ -260,12 +267,12 @@
       "Properties":{
         "HealthCheckIntervalSeconds":10,
         "HealthCheckPath":"/",
-        "HealthCheckProtocol":"HTTP",
+        "HealthCheckProtocol":"HTTPS",
         "HealthCheckTimeoutSeconds":5,
         "HealthyThresholdCount":2,
         "Name":"nginx-tg",
-        "Port":80,
-        "Protocol":"HTTP",
+        "Port":443,
+        "Protocol":"HTTPS",
         "UnhealthyThresholdCount":2,
         "VpcId":{
           "Ref":"VPC"
@@ -371,7 +378,7 @@
         "LoadBalancers":[
           {
             "ContainerName":"nginx-app",
-            "ContainerPort":"80",
+            "ContainerPort":"443",
             "TargetGroupArn":{
               "Ref":"ECSTG"
             }

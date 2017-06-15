@@ -19,7 +19,12 @@ export const nginxProxyConf = (req, res, next) => {
 
       nginxConf += `
 server {
-  server_name  ${user.domain}.stackbee.cloud;
+  listen                443 ssl;
+  ssl                   on;
+  ssl_certificate       /etc/ssl/cert_chain.crt;
+  ssl_certificate_key   /etc/ssl/stackbee.cloud.key;
+
+  server_name           ${user.domain}.stackbee.cloud;
 
   location / {
     proxy_pass http://${owncloudRoute};

@@ -64,11 +64,11 @@ const processUsers = (users, callback) => {
 
   users.forEach((user) => {
     const customer = user.name;
+    const domain = user.domain;
     const customerService = customerExistsInServices(customer);
     if (customerService === false) {
 
-      const domain = createTaskDef(user);
-      if (domain) {
+      if (createTaskDef(user)) {
 
         // create new database on RDS for this new owncloud installation
         const mysqlUser = 'sbmaria';
@@ -108,47 +108,70 @@ const processUsers = (users, callback) => {
           console.log(`service "sb-${customer}-owncloud" successfully created! 🚚`.green);
           user.owncloudMeta.ecsOwncloudServiceArn = serviceRes.service.serviceArn;
 
-          // run new task in this service
-          try {
-            exec(`aws ecs run-task --cluster ${OWNCLOUD_CLUSTER_NAME} --task-definition ${customer}-owncloud --group service:${customer}-owncloud`);
-          } catch (e) {
-            // ignore
-          }
+          user.markModified('owncloudMeta');
+          user.save((err, user) => {
+            if (err) { return console.log('Could not save user!', err); }
+            // run new task in this service
+            try {
+              exec(`aws ecs run-task --cluster ${OWNCLOUD_CLUSTER_NAME} --task-definition ${customer}-owncloud --group service:${customer}-owncloud`);
+            } catch (e) {
+              // ignore
+            }
 
-          setTimeout(() => {
-            const taskListRes = JSON.parse(exec(`aws ecs list-tasks --cluster ${OWNCLOUD_CLUSTER_NAME} --service ${customer}-owncloud`));
-            taskListRes.taskArns.forEach((taskArn) => {
-              waitForTaskRun(OWNCLOUD_CLUSTER_NAME, taskArn, (describeTaskRes) => {
-                console.log('task successfully started! 🎉'.green);
+            setTimeout(() => {
+              const taskListRes = JSON.parse(exec(`aws ecs list-tasks --cluster ${OWNCLOUD_CLUSTER_NAME} --service ${customer}-owncloud`));
+              taskListRes.taskArns.forEach((taskArn) => {
+                waitForTaskRun(OWNCLOUD_CLUSTER_NAME, taskArn, (describeTaskRes) => {
+                  const containerInstancesRes = JSON.parse(exec(
+                    `aws ecs describe-container-instances --cluster ${OWNCLOUD_CLUSTER_NAME} --container-instances ${describeTaskRes.containerInstanceArn}`
+                  ));
+                  const containerInstance = containerInstancesRes.containerInstances.pop();
+                  const ec2InstanceRes = JSON.parse(exec(
+                    `aws ec2 describe-instances --instance-ids ${containerInstance.ec2InstanceId}`
+                  ));
+                  const reservations = ec2InstanceRes.Reservations.pop();
+                  const instance = reservations.Instances.pop();
+                  user.owncloudMeta.owncloudRoute = `${instance.PublicIpAddress}:${user.owncloudMeta.owncloudPort}`;
 
-                // update EC2 security-group and load-balancer to enable access for the new port on "stackbee.cloud"
-                exec(`aws ec2 authorize-security-group-ingress --group-id ${OWNCLOUD_SECURITY_GROUP_ID} --protocol tcp --port ${user.owncloudMeta.owncloudPort} --cidr 0.0.0.0/0`);
+                  console.log('task successfully started! 🎉'.green);
 
-                try {
-                  const listeners = [
-                    {
-                      "Protocol": "HTTPS",
-                      "LoadBalancerPort": user.owncloudMeta.owncloudPort,
-                      "InstanceProtocol": "HTTP",
-                      "InstancePort": user.owncloudMeta.owncloudPort,
-                      "SSLCertificateId": OWNCLOUD_SSL_CERT_ID
-                    }
-                  ];
-                  exec(`aws elb create-load-balancer-listeners --load-balancer-name ${OWNCLOUD_LOAD_BALANCER_NAME} --listeners "${addSlashes(JSON.stringify(listeners))}"`);
-                } catch (e) {
-                  // ignore
-                }
+                  // update EC2 security-group and load-balancer to enable access for the new port on "stackbee.cloud"
+                  try {
+                    exec(`aws ec2 authorize-security-group-ingress --group-id ${OWNCLOUD_SECURITY_GROUP_ID} --protocol tcp --port ${user.owncloudMeta.owncloudPort} --cidr 0.0.0.0/0`);
+                  } catch (e) {
+                    // ignore
+                  }
 
-                user.save((err, user) => {
-                  if (err) { return console.log('Could not save user!', err); }
-                  console.log(`User updated with serviceArn "${user.owncloudMeta.ecsOwncloudServiceArn}"`.green);
-                  callback();
+                  try {
+
+                    const listeners = [
+                      {
+                        "Protocol": "HTTPS",
+                        "LoadBalancerPort": user.owncloudMeta.owncloudPort,
+                        "InstanceProtocol": "HTTP",
+                        "InstancePort": user.owncloudMeta.owncloudPort,
+                        "SSLCertificateId": OWNCLOUD_SSL_CERT_ID
+                      }
+                    ];
+                    exec(`aws elb create-load-balancer-listeners --load-balancer-name ${OWNCLOUD_LOAD_BALANCER_NAME} --listeners "${addSlashes(JSON.stringify(listeners))}"`);
+                  } catch (e) {
+                    // ignore
+                  }
+
+                  user.markModified('owncloudMeta');
+                  user.save((err, user) => {
+                    if (err) { return console.log('Could not save user!', err); }
+                    console.log(user);
+                    console.log(`User updated with serviceArn "${user.owncloudMeta.ecsOwncloudServiceArn}"`.green);
+                    callback();
+                  });
+
                 });
-
               });
-            });
 
-          }, 8000);
+            }, 8000);
+          });
+          // TODO: place a message-queue notification to update all the nginx proxy.conf's on all running nginx containers
         } else {
           console.log('❗️ could not create service in the cluster ❗️'.red);
           callback();

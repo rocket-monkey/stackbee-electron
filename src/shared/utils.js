@@ -28,21 +28,18 @@ export const findArg = (argName) => {
 }
 
 export const createTaskDef = (user) => {
-  const customer = user.name;
-  const domain = customer; // TODO: make sure a user has usable subdomain!
-
   const volumes = [
     {
       'name': 'efs',
       'host': {
-        'sourcePath': '/mnt/efs/owncloud/${domain}'
+        'sourcePath': `/mnt/efs/owncloud/${user.domain}`
       }
     }
   ];
 
   const definition = [
     {
-      'name': `sb-${customer}-owncloud`,
+      'name': `sb-${user.name}-owncloud`,
       'image': 'stackbeeio/owncloud',
       'cpu': 10,
       'memory': 500,
@@ -61,28 +58,27 @@ export const createTaskDef = (user) => {
         }
       ],
       'environment' : [
-        { 'name' : 'CUSTOMER_DOMAIN', 'value' : domain }
+        { 'name' : 'CUSTOMER_DOMAIN', 'value' : user.domain }
       ],
       'essential': true
     }
   ];
 
   const taskRes = JSON.parse(exec(
-    `aws ecs register-task-definition --family ${customer}-owncloud --network-mode "bridge" --volumes "${addSlashes(JSON.stringify(volumes))}" --container-definitions "${addSlashes(JSON.stringify(definition))}"`
+    `aws ecs register-task-definition --family ${user.name}-owncloud --network-mode "bridge" --volumes "${addSlashes(JSON.stringify(volumes))}" --container-definitions "${addSlashes(JSON.stringify(definition))}"`
   ));
 
   if (taskRes.taskDefinition.status === 'ACTIVE') {
     console.log(`task def successfully updated! 🎉`.blue);
-    return domain;
+    return true;
   }
 
-  return null;
+  return false;
 };
 
 let intervals = 0;
 export const waitForTaskRun = (clusterName, taskArn, callback) => {
   setTimeout(() => {
-    intervals++;
     if (intervals >= TASK_RUN_MAX_WAIT_INTERVALS) {
       console.log(`waiting for task-run exceeded max-wait-intervals of ${TASK_RUN_MAX_WAIT_INTERVALS} 😢`.red);
       intervals = 0;
@@ -93,12 +89,16 @@ export const waitForTaskRun = (clusterName, taskArn, callback) => {
     const describeTaskRes = JSON.parse(exec(
       `aws ecs describe-tasks --cluster ${clusterName} --tasks ${taskArn}`
     ));
+    console.log('wot', describeTaskRes);
 
     const task = describeTaskRes.tasks.pop();
     if (task.lastStatus === 'RUNNING') {
+      console.log('running callback');
       intervals = 0;
       callback(task);
     } else if (task.lastStatus === 'PENDING') {
+      console.log('wait again', );
+      intervals++;
       waitForTaskRun(clusterName, taskArn, callback);
     }
   }, TASK_RUN_WAIT_TIMEOUT);
