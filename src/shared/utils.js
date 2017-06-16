@@ -1,7 +1,7 @@
 import colors from 'colors';
 
 const TASK_RUN_WAIT_TIMEOUT = 1000;
-const TASK_RUN_MAX_WAIT_INTERVALS = 20;
+const TASK_RUN_MAX_WAIT_INTERVALS = 600; // 10min
 
 const execSync = require('child_process').execSync;
 
