@@ -23,13 +23,15 @@ export const authenticate = (req, res) => {
 
           // if user is found and password is right
           // create a token
-          var token = jwt.sign({
+          const options = user.name === 'admin' ? {} : {
+            expiresIn: 60*60*24 // expires in 24 hours
+          };
+
+          const token = jwt.sign({
             name: user.name,
             email: user.email,
             roles: user.roles,
-          }, config.secret, {
-            expiresIn: 60*60*24 // expires in 24 hours
-          });
+          }, config.secret, options);
 
           // return the information including token as JSON
           res.json({

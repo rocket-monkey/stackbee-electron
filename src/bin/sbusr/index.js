@@ -1,6 +1,7 @@
 import colors from 'colors';
 import { findArg } from '../../shared/utils';
 import {
+  hash,
   createUser,
   killUser,
 } from './shared/utils';
@@ -12,11 +13,11 @@ export default () => {
   const email = findArg('email=');
   const pw = findArg('pw=');
 
-  if (!email) {
+  if (!email && command !== 'hash') {
     return console.log('no "email=<email>" given to sbm sbusr command ❗️'.red);
   }
 
-  if (!pw) {
+  if (!pw && command !== 'hash') {
     return console.log('no "pw=<password>" given to sbm sbusr command ❗️'.red);
   }
 
@@ -39,6 +40,11 @@ export default () => {
       }
 
       createUser(name, domain, email, pw, modules);
+      break;
+
+    case 'hash':
+      const input = findArg('input=') || '';
+      hash(input);
       break;
 
     case 'kill':

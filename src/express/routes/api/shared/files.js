@@ -1,6 +1,13 @@
 import User from '../../../../shared/db/schema/user';
 
 export const nginxProxyConf = (req, res, next) => {
+  if (req.decoded.email !== 'admin@stackbee.io') {
+    return res.status(403).send({
+        success: false,
+        message: 'Only stackbee.io admin can access this route!'
+    });
+  }
+
   User.find({ 'modules': { $in: ['owncloud'] }}, (error, users) => {
     let nginxConf = '';
     users.forEach((user) => {
@@ -40,6 +47,13 @@ server {
 };
 
 export const owncloudAutoconfig = (req, res, next) => {
+  if (req.decoded.email !== 'admin@stackbee.io') {
+    return res.status(403).send({
+        success: false,
+        message: 'Only stackbee.io admin can access this route!'
+    });
+  }
+
   const domain = req.params.domain;
   User.findOne({ domain }, (err, user) => {
     if (err) { return console.log('Could not load user!', err); }

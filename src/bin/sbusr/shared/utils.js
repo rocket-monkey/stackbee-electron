@@ -18,6 +18,10 @@ const hasModule = (modules, moduleName) => {
 }
 
 export const createUser = (name, domain, email, pw, modules) => {
+  if (pw.indexOf('{') > -1 || pw.indexOf('}') > -1) {
+    return console.log('no curly braces "{}" allowed in passwords, crypto will break! 🙈'.red);
+  }
+
   connectDb();
   initSalt();
 
@@ -70,6 +74,30 @@ const createUserNow = (data) => {
     });
   });
 }
+
+export const hash = (input) => {
+  if (input.indexOf('{') > -1 || input.indexOf('}') > -1) {
+    return console.log('no curly braces "{}" allowed in passwords, crypto will break! 🙈'.red);
+  }
+
+  connectDb();
+  initSalt();
+  PasswordSalt.find({}, (err, entries) => {
+    if (err) throw err;
+    if (!entries.length) {
+      console.log(colors.red('No password salt found in db - check startup routine!'));
+      return;
+    }
+
+    const passwordSaltEntry = entries.pop();
+
+    bcrypt.hash(input, passwordSaltEntry.salt, (bcryptErr, hashedValue) => {
+      if (bcryptErr) throw bcryptErr;
+      mongoose.connection.close();
+      console.log(`Hashed value: ${hashedValue}`.blue);
+    });
+  });
+};
 
 export const killUser = (email) => {
   console.log('TODO'.red);
