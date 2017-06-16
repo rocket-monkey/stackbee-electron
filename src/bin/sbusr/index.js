@@ -10,9 +10,14 @@ export default () => {
   const name = findArg('name=');
   const domain = findArg('domain=');
   const email = findArg('email=');
+  const pw = findArg('pw=');
 
   if (!email) {
     return console.log('no "email=<email>" given to sbm sbusr command ❗️'.red);
+  }
+
+  if (!pw) {
+    return console.log('no "pw=<password>" given to sbm sbusr command ❗️'.red);
   }
 
   switch (command) {
@@ -33,7 +38,7 @@ export default () => {
         modules = ['owncloud']; // default
       }
 
-      createUser(name, domain, email, modules);
+      createUser(name, domain, email, pw, modules);
       break;
 
     case 'kill':

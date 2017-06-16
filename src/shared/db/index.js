@@ -1,8 +1,9 @@
 import colors from 'colors';
 import mongoose from 'mongoose';
+import config from '../../internals/config';
 
 const getDbConnectionUrl = () => {
-  const defaultUrl = process.env.DATABASE ? (process.env.DATABASE) : 'mongodb://admin:98eb9Vb6mfvVVoHT@ds163561.mlab.com:63561/sb-mongo-prod';
+  const defaultUrl = process.env.DATABASE ? (process.env.DATABASE) : config.database;
   return process.env.NODE_ENV === 'test' ? 'mongodb://localhost:27017/sb-owncloud-test' : defaultUrl;
 };
 

@@ -1,23 +1,33 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import colors from 'colors';
 
 const Schema = mongoose.Schema;
 
 // create a schema
 const userSchema = new Schema({
-  name                  : String,
+  name                  : { type: String, required: true, unique: true },
   email                 : { type: String, required: true, unique: true },
   password              : { type: String, required: true },
-  domain                : { type: String, required: true },
-  modules               : { type: Array, default: [] },
-  owncloudMeta          : { type: Object, default: {} },
+  domain                : { type: String, required: true, unique: true },
   modules               : { type: Array, default: [] },
   roles                 : { type: Array, default: ['user'] },
   provider              : { type: Object, default: {} },
+  owncloudMeta          : { type: Object, default: {} },
   createdAt             : { type: Date, default: Date.now },
   updatedAt             : { type: Date, default: Date.now },
   rememberPwCode        : { type: String, default: null },
   rememberPwCodeAt      : { type: Number, default: null },
 });
+
+userSchema.methods.authenticate = function authenticate(passwordClearText, callback) {
+  bcrypt.compare(passwordClearText, this.password, function(err, res) { // eslint-disable-line
+    if (err) throw err;
+    if (process.env.AUTH_DEV) console.log(colors.bgYellow(`bcrypt compare result "${res}"`)); // eslint-disable-line max-len
+    callback(res);
+  });
+};
+
 
 // the schema is useless so far
 // we need to create a model using it

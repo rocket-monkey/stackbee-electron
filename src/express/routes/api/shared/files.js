@@ -1,4 +1,4 @@
-import User from '../../../shared/db/schema/user';
+import User from '../../../../shared/db/schema/user';
 
 export const nginxProxyConf = (req, res, next) => {
   User.find({ 'modules': { $in: ['owncloud'] }}, (error, users) => {
