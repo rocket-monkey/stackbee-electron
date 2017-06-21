@@ -12,16 +12,16 @@ export const nginxProxyConf = (req, res, next) => {
     let nginxConf = '';
     users.forEach((user) => {
       const owncloudMeta = user.owncloudMeta || {};
-      let owncloudRoute;
+      let route;
       Object
         .keys(owncloudMeta)
         .forEach((key) => {
-          if (key === 'owncloudRoute') {
-            owncloudRoute = owncloudMeta[key];
+          if (key === 'route') {
+            route = owncloudMeta[key];
           }
         });
-      if (owncloudMeta.length === 0 || !owncloudRoute) {
-        return console.log(`user without owncloudRoute found! update "${user.name}" accordingly!`.red);
+      if (owncloudMeta.length === 0 || !route) {
+        return console.log(`user without route found! update "${user.name}" accordingly!`.red);
       }
 
       nginxConf += `
@@ -34,7 +34,7 @@ server {
   server_name           ${user.domain}.stackbee.cloud;
 
   location / {
-    proxy_pass http://${owncloudRoute};
+    proxy_pass http://${route};
     include /etc/nginx/conf.d/proxy_vars.conf;
   }
 }
@@ -60,11 +60,13 @@ export const owncloudAutoconfig = (req, res, next) => {
     const content = `<?php
 $AUTOCONFIG = array(
   "dbtype"        => "mysql",
-  "dbname"        => "${user.owncloudMeta.owncloudDbName}",
-  "dbuser"        => "${user.owncloudMeta.owncloudDbUser}",
-  "dbpass"        => "${user.owncloudMeta.owncloudDbPassword}",
-  "dbhost"        => "${user.owncloudMeta.owncloudDbHost}",
+  "dbname"        => "${user.owncloudMeta.dbName}",
+  "dbuser"        => "${user.owncloudMeta.dbUser}",
+  "dbpass"        => "${user.owncloudMeta.dbPassword}",
+  "dbhost"        => "${user.owncloudMeta.dbHost}",
   "dbtableprefix" => "oc_",
+  "adminlogin"    => "admin",
+  "adminpass"     => "${user.owncloudMeta.adminPass}",
   "directory"     => "/efs/data",
 );
   `;

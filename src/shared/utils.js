@@ -37,12 +37,21 @@ export const createTaskDef = (user) => {
     }
   ];
 
+  // 'logConfiguration':{
+  //       'logDriver': 'awslogs',
+  //       'options': {
+  //         'awslogs-group': '',
+  //         'awslogs-region': 'eu-west-1',
+  //         'awslogs-stream-prefix': `sb-${user.name}-owncloud`
+  //       }
+  //     },
+
   const definition = [
     {
       'name': `sb-${user.name}-owncloud`,
       'image': 'stackbeeio/owncloud',
-      'cpu': 10,
-      'memory': 500,
+      'cpu': 40,
+      'memory': 850,
       'mountPoints': [
         {
           'containerPath': '/efs/data',
@@ -50,15 +59,27 @@ export const createTaskDef = (user) => {
           'readOnly': false
         }
       ],
+      'logConfiguration': {
+        'logDriver': 'awslogs',
+        'options': {
+          'awslogs-group': 'ecs-log-streaming',
+          'awslogs-region': 'eu-west-1',
+          'awslogs-stream-prefix': `sb-${user.name}-owncloud`
+        }
+      },
       'portMappings': [
         {
-          'hostPort': user.owncloudMeta.owncloudPort,
+          'hostPort': user.owncloudMeta.port,
           'containerPort': 80,
           'protocol': 'tcp'
         }
       ],
       'environment' : [
-        { 'name' : 'CUSTOMER_DOMAIN', 'value' : user.domain }
+        { 'name' : 'CUSTOMER_DOMAIN', 'value' : user.domain },
+        { 'name' : 'DB_HOST', 'value' : user.owncloudMeta.dbHost },
+        { 'name' : 'DB_NAME', 'value' : user.owncloudMeta.dbName },
+        { 'name' : 'DB_USER', 'value' : user.owncloudMeta.dbUser },
+        { 'name' : 'DB_PASS', 'value' : user.owncloudMeta.dbPassword }
       ],
       'essential': true
     }

@@ -27,13 +27,15 @@ export const createUser = (name, domain, email, pw, modules) => {
 
   if (hasModule(modules, 'owncloud')) {
     User
-      .find()
-      .sort({ 'owncloudMeta.owncloudPort': 1 })
+      .find({ 'modules': { $in: ['owncloud'] } })
+      .sort({ 'owncloudMeta.port': -1 })
+      .limit(1)
       .exec((error, users) => {
-        let owncloudPort = 1080;
+        let port = 1080;
         if (users.length > 0) {
-          owncloudPort = users[0].owncloudMeta.owncloudPort + 1;
+          port = users[0].owncloudMeta.port + 1;
         }
+        const adminPass = Math.random().toString(36).slice(-8);
         createUserNow({
           name,
           email,
@@ -41,8 +43,9 @@ export const createUser = (name, domain, email, pw, modules) => {
           domain,
           modules,
           owncloudMeta: {
-            owncloudPort,
-            owncloudDbHost: RDS_PROD_DATABASE,
+            port,
+            dbHost: RDS_PROD_DATABASE,
+            adminPass,
           },
         });
       });

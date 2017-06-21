@@ -19,8 +19,7 @@ import {
 
 export const processNewOcUsers = (users, callback) => {
   connectDb();
-  // TODO: and check if the user actually has the owncloud module!
-  User.find({ 'owncloudMeta.ecsOwncloudServiceArn': { $exists: false } }, (error, users) => {
+  User.find({ 'modules': { $in: ['owncloud'] }, 'owncloudMeta.serviceArn': { $exists: false } }, (error, users) => {
     processUsers(users, () => {
       mongoose.connection.close();
     });
@@ -68,36 +67,36 @@ const processUsers = (users, callback) => {
     const customerService = customerExistsInServices(customer);
     if (customerService === false) {
 
+      // create new database on RDS for this new owncloud installation
+      const mysqlUser = 'sbmaria';
+      const mysqlPw = 'iqk2fJAKY744';
+      const host = 'sb-maria-prod.cfwyrgfxdbjd.eu-west-1.rds.amazonaws.com';
+      const dbName = `sb_${domain.replace(/-/i, '_')}_owncloud`;
+      const dbUser = `${dbName}_admin`;
+      const dbPassword = user.owncloudMeta.dbPassword || Math.random().toString(36).slice(-8);
+      exec(
+        `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "CREATE DATABASE IF NOT EXISTS ${dbName} CHARACTER SET utf8 COLLATE utf8_general_ci;"`
+      );
+      try {
+        exec(
+          `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "DROP USER ${dbUser}@'%'"`
+        );
+      } catch (e) {
+        // ignore
+      }
+      exec(
+        `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "CREATE USER ${dbUser}@'%' IDENTIFIED BY '${dbPassword}'"`
+      );
+      exec(
+        `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "GRANT SELECT, INSERT, UPDATE, CREATE, DELETE ON ${dbName}.* TO '${dbUser}'@'%'"`
+      );
+      console.log(`new database name: ${dbName}, user: ${dbUser} 👊`.green);
+
+      user.owncloudMeta.dbName = dbName;
+      user.owncloudMeta.dbUser = dbUser;
+      user.owncloudMeta.dbPassword = dbPassword;
+
       if (createTaskDef(user)) {
-
-        // create new database on RDS for this new owncloud installation
-        const mysqlUser = 'sbmaria';
-        const mysqlPw = 'iqk2fJAKY744';
-        const host = 'sb-maria-prod.cfwyrgfxdbjd.eu-west-1.rds.amazonaws.com';
-        const dbName = `sb_${domain.replace(/-/i, '_')}_owncloud`;
-        const dbUser = `${dbName}_admin`;
-        const dbPassword = Math.random().toString(36).slice(-8);
-        exec(
-          `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "CREATE DATABASE IF NOT EXISTS ${dbName} CHARACTER SET utf8 COLLATE utf8_general_ci;"`
-        );
-        try {
-          exec(
-            `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "DROP USER ${dbUser}@'%'"`
-          );
-        } catch (e) {
-          // ignore
-        }
-        exec(
-          `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "CREATE USER ${dbUser}@'%' IDENTIFIED BY '${dbPassword}'"`
-        );
-        exec(
-          `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "GRANT SELECT, INSERT, UPDATE, CREATE, DELETE ON ${dbName}.* TO '${dbUser}'@'%'"`
-        );
-        console.log(`new database name: ${dbName}, user: ${dbUser} 👊`.green);
-
-        user.owncloudMeta.owncloudDbName = dbName;
-        user.owncloudMeta.owncloudDbUser = dbUser;
-        user.owncloudMeta.owncloudDbPassword = dbPassword;
 
         // create new service in this cluster
         const serviceRes = JSON.parse(exec(
@@ -106,7 +105,7 @@ const processUsers = (users, callback) => {
 
         if (serviceRes.service.status === 'ACTIVE') {
           console.log(`service "sb-${customer}-owncloud" successfully created! 🚚`.green);
-          user.owncloudMeta.ecsOwncloudServiceArn = serviceRes.service.serviceArn;
+          user.owncloudMeta.serviceArn = serviceRes.service.serviceArn;
 
           user.markModified('owncloudMeta');
           user.save((err, user) => {
@@ -131,13 +130,13 @@ const processUsers = (users, callback) => {
                   ));
                   const reservations = ec2InstanceRes.Reservations.pop();
                   const instance = reservations.Instances.pop();
-                  user.owncloudMeta.owncloudRoute = `${instance.PublicIpAddress}:${user.owncloudMeta.owncloudPort}`;
+                  user.owncloudMeta.route = `${instance.PublicIpAddress}:${user.owncloudMeta.port}`;
 
                   console.log('task successfully started! 🎉'.green);
 
                   // update EC2 security-group and load-balancer to enable access for the new port on "stackbee.cloud"
                   try {
-                    exec(`aws ec2 authorize-security-group-ingress --group-id ${OWNCLOUD_SECURITY_GROUP_ID} --protocol tcp --port ${user.owncloudMeta.owncloudPort} --cidr 0.0.0.0/0`);
+                    exec(`aws ec2 authorize-security-group-ingress --group-id ${OWNCLOUD_SECURITY_GROUP_ID} --protocol tcp --port ${user.owncloudMeta.port} --cidr 0.0.0.0/0`);
                   } catch (e) {
                     // ignore
                   }
@@ -147,9 +146,9 @@ const processUsers = (users, callback) => {
                     const listeners = [
                       {
                         "Protocol": "HTTPS",
-                        "LoadBalancerPort": user.owncloudMeta.owncloudPort,
+                        "LoadBalancerPort": user.owncloudMeta.port,
                         "InstanceProtocol": "HTTP",
-                        "InstancePort": user.owncloudMeta.owncloudPort,
+                        "InstancePort": user.owncloudMeta.port,
                         "SSLCertificateId": OWNCLOUD_SSL_CERT_ID
                       }
                     ];
@@ -162,7 +161,7 @@ const processUsers = (users, callback) => {
                   user.save((err, user) => {
                     if (err) { return console.log('Could not save user!', err); }
                     console.log(user);
-                    console.log(`User updated with serviceArn "${user.owncloudMeta.ecsOwncloudServiceArn}"`.green);
+                    console.log(`User updated with serviceArn "${user.owncloudMeta.serviceArn}"`.green);
                     callback();
                   });
 
@@ -180,7 +179,7 @@ const processUsers = (users, callback) => {
         callback();
       }
     } else {
-      user.owncloudMeta.ecsOwncloudServiceArn = customerService;
+      user.owncloudMeta.serviceArn = customerService;
       user.save((err, user) => {
         if (err) { return console.log('Could not save user!', err); }
         console.log(`User updated with serviceArn "${customerService}"`.green);
