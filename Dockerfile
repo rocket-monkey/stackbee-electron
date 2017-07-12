@@ -1,6 +1,19 @@
 FROM node:alpine
 MAINTAINER Remo Vetere <remo.vetere@gmail.com>
 
+# install aws
+RUN \
+	mkdir -p /aws && \
+	apk -Uuv add groff less python py-pip && \
+	pip install awscli && \
+	apk --purge -v del py-pip && \
+	rm /var/cache/apk/* && \
+    echo "export PATH=$PATH:/aws"
+
+ADD .aws/credentials /root/.aws/
+# ENV AWS_ACCESS_KEY_ID AKIAJYYCPYM535RG7IDA
+# ENV AWS_SECRET_ACCESS_KEY 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
+
 # Bundle app source
 ADD . /src
 

@@ -1,12 +1,20 @@
 import express from 'express';
+
 import {
   nginxProxyConf,
   owncloudAutoconfig,
 } from './shared/files';
+
 import {
   authenticate,
 } from './shared/auth';
+
+import {
+  updateOcRoute,
+} from './shared/mgmt';
+
 import jwtMiddleware from '../../middlewares/jwt';
+
 const router = express.Router(); // eslint-disable-line new-cap
 
 router.get('/', (req, res, next) => {
@@ -20,5 +28,6 @@ router.use(jwtMiddleware);
 
 router.get('/nginx/proxy.conf', nginxProxyConf);
 router.get('/owncloud/autoconfig.php/:domain', owncloudAutoconfig);
+router.get('/owncloud/update-route/:domain', updateOcRoute);
 
 export default router;

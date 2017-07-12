@@ -160,7 +160,7 @@
             "Cpu": "25",
             "Essential": "true",
             "Image": "stackbeeio/nginx:latest",
-            "Memory": "250",
+            "Memory": "475",
             "LogConfiguration": {
               "LogDriver": "awslogs",
               "Options": {
