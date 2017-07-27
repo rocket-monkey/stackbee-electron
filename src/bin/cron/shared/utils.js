@@ -3,73 +3,137 @@ import {
   exec,
   addSlashes,
 } from '../../../shared/utils';
+import {
+  RDS_PROD_DATABASE,
+  OWNCLOUD_CLUSTER_NAME,
+  OWNCLOUD_SECURITY_GROUP_ID,
+  OWNCLOUD_LOAD_BALANCER_NAME,
+  OWNCLOUD_SSL_CERT_ID,
+} from '../../../shared/constants';
 
 const TASK_RUN_WAIT_TIMEOUT = 1000;
 const TASK_RUN_MAX_WAIT_INTERVALS = 600; // 10min
 
-export const createTaskDef = (user) => {
-  const volumes = [
-    {
-      'name': 'efs',
-      'host': {
-        'sourcePath': `/mnt/efs/owncloud/${user.domain}`
+export const createTaskDef = (user, ecs, callback) => {
+
+  // const volumes = [
+  //   {
+  //     'name': 'efs',
+  //     'host': {
+  //       'sourcePath': `/mnt/efs/owncloud/${user.domain}`
+  //     }
+  //   }
+  // ];
+
+  // const definition = [
+  //   {
+  //     'name': `sb-${user.name}-owncloud`,
+  //     'image': 'stackbeeio/nextcloud',
+  //     'cpu': 33,
+  //     'memory': 600,
+  //     'mountPoints': [
+  //       {
+  //         'containerPath': '/efs/data',
+  //         'sourceVolume': 'efs',
+  //         'readOnly': false
+  //       }
+  //     ],
+  //     'logConfiguration': {
+  //       'logDriver': 'awslogs',
+  //       'options': {
+  //         'awslogs-group': 'ECSLogGroup-sb-owncloud-deps',
+  //         'awslogs-region': 'eu-west-1',
+  //         'awslogs-stream-prefix': `sb-${user.name}-owncloud`
+  //       }
+  //     },
+  //     'portMappings': [
+  //       {
+  //         'hostPort': user.owncloudMeta.port,
+  //         'containerPort': 80,
+  //         'protocol': 'tcp'
+  //       }
+  //     ],
+  //     'environment' : [
+  //       { 'name' : 'CUSTOMER_DOMAIN', 'value' : user.domain },
+  //       { 'name' : 'DB_HOST', 'value' : user.owncloudMeta.dbHost },
+  //       { 'name' : 'DB_NAME', 'value' : user.owncloudMeta.dbName },
+  //       { 'name' : 'DB_USER', 'value' : user.owncloudMeta.dbUser },
+  //       { 'name' : 'DB_PASS', 'value' : user.owncloudMeta.dbPassword }
+  //     ],
+  //     'essential': true
+  //   }
+  // ];
+
+  // const taskRes = JSON.parse(exec(
+  //   `aws ecs register-task-definition --family ${user.name}-owncloud --network-mode "bridge" --volumes "${addSlashes(JSON.stringify(volumes))}" --container-definitions "${addSlashes(JSON.stringify(definition))}"`
+  // ));
+
+  const params = {
+    containerDefinitions: [
+      {
+        name: `sb-${user.name}-owncloud`,
+        image: 'stackbeeio/nextcloud',
+        cpu: 33,
+        memory: 600,
+        mountPoints: [
+          {
+            containerPath: '/efs/data',
+            sourceVolume: 'efs',
+            readOnly: false
+          }
+        ],
+        logConfiguration: {
+          logDriver: 'awslogs',
+          options: {
+            'awslogs-group': 'ECSLogGroup-sb-owncloud-deps',
+            'awslogs-region': 'eu-west-1',
+            'awslogs-stream-prefix': `sb-${user.name}-owncloud`
+          }
+        },
+        portMappings: [
+          {
+            hostPort: user.owncloudMeta.port,
+            containerPort: 80,
+            protocol: 'tcp'
+          }
+        ],
+        environment : [
+          { name : 'CUSTOMER_DOMAIN', value : user.domain },
+          { name : 'DB_HOST', value : user.owncloudMeta.dbHost },
+          { name : 'DB_NAME', value : user.owncloudMeta.dbName },
+          { name : 'DB_USER', value : user.owncloudMeta.dbUser },
+          { name : 'DB_PASS', value : user.owncloudMeta.dbPassword }
+        ],
+        volumes: [
+          {
+            'name': 'efs',
+            'host': {
+              'sourcePath': `/mnt/efs/owncloud/${user.domain}`
+            }
+          }
+        ],
+        essential: true
       }
+    ]
+  };
+
+  ecs.registerTaskDefinition(params, (err, data) {
+    if (err) {
+      console.log(err, err.stack); // an error occurred
+      return callback(false);
     }
-  ];
 
-  const definition = [
-    {
-      'name': `sb-${user.name}-owncloud`,
-      'image': 'stackbeeio/nextcloud',
-      'cpu': 33,
-      'memory': 600,
-      'mountPoints': [
-        {
-          'containerPath': '/efs/data',
-          'sourceVolume': 'efs',
-          'readOnly': false
-        }
-      ],
-      'logConfiguration': {
-        'logDriver': 'awslogs',
-        'options': {
-          'awslogs-group': 'ECSLogGroup-sb-owncloud-deps',
-          'awslogs-region': 'eu-west-1',
-          'awslogs-stream-prefix': `sb-${user.name}-owncloud`
-        }
-      },
-      'portMappings': [
-        {
-          'hostPort': user.owncloudMeta.port,
-          'containerPort': 80,
-          'protocol': 'tcp'
-        }
-      ],
-      'environment' : [
-        { 'name' : 'CUSTOMER_DOMAIN', 'value' : user.domain },
-        { 'name' : 'DB_HOST', 'value' : user.owncloudMeta.dbHost },
-        { 'name' : 'DB_NAME', 'value' : user.owncloudMeta.dbName },
-        { 'name' : 'DB_USER', 'value' : user.owncloudMeta.dbUser },
-        { 'name' : 'DB_PASS', 'value' : user.owncloudMeta.dbPassword }
-      ],
-      'essential': true
+    if (data.taskDefinition.status === 'ACTIVE') {
+      console.log(`task def successfully updated! 🎉`.blue);
+      return callback(true);
     }
-  ];
 
-  const taskRes = JSON.parse(exec(
-    `aws ecs register-task-definition --family ${user.name}-owncloud --network-mode "bridge" --volumes "${addSlashes(JSON.stringify(volumes))}" --container-definitions "${addSlashes(JSON.stringify(definition))}"`
-  ));
-
-  if (taskRes.taskDefinition.status === 'ACTIVE') {
-    console.log(`task def successfully updated! 🎉`.blue);
-    return true;
-  }
-
-  return false;
+    callback(false);
+  });
 };
 
 let intervals = 0;
-export const waitForTaskRun = (clusterName, taskArn, callback) => {
+export const waitForTaskRun = (ecs, taskArn, callback) => {
   setTimeout(() => {
     if (intervals >= TASK_RUN_MAX_WAIT_INTERVALS) {
       console.log(`waiting for task-run exceeded max-wait-intervals of ${TASK_RUN_MAX_WAIT_INTERVALS} 😢`.red);
@@ -78,22 +142,20 @@ export const waitForTaskRun = (clusterName, taskArn, callback) => {
       return;
     }
 
-    const describeTaskRes = JSON.parse(exec(
-      `aws ecs describe-tasks --cluster ${clusterName} --tasks ${taskArn}`
-    ));
+    ecs.describeTasks({ cluster: OWNCLOUD_CLUSTER_NAME, tasks: [taskArn] }, (err, data) => {
+      if (err) return console.log(err, err.stack); // an error occurred
 
-    // console.log('wot', describeTaskRes);
-
-    const task = describeTaskRes.tasks.pop();
-    if (task.lastStatus === 'RUNNING') {
-      console.log('running callback');
-      intervals = 0;
-      callback(task);
-    } else if (task.lastStatus === 'PENDING') {
-      console.log('wait again', );
-      intervals++;
-      waitForTaskRun(clusterName, taskArn, callback);
-    }
+      const task = data.tasks.pop();
+      if (task.lastStatus === 'RUNNING') {
+        console.log('running callback');
+        intervals = 0;
+        callback(task);
+      } else if (task.lastStatus === 'PENDING') {
+        console.log('wait again', );
+        intervals++;
+        waitForTaskRun(ecs, taskArn, callback);
+      }
+    });
   }, TASK_RUN_WAIT_TIMEOUT);
 };
 
