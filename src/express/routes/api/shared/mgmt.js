@@ -51,3 +51,11 @@ export const updateOcRoute = (req, res, next) => {
     });
   });
 };
+
+export const loggo = (req, res, next) => {
+  const message = req.params.message;
+  console.log(`🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘`);
+  console.log(`❗️ LOGGO MESSAGO ❗️ ${message}`);
+  console.log(`🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘`);
+  res.send('logged!');
+};

@@ -11,6 +11,7 @@ import {
 
 import {
   updateOcRoute,
+  loggo,
 } from './shared/mgmt';
 
 import jwtMiddleware from '../../middlewares/jwt';
@@ -29,5 +30,6 @@ router.use(jwtMiddleware);
 router.get('/nginx/proxy.conf', nginxProxyConf);
 router.get('/owncloud/autoconfig.php/:domain', owncloudAutoconfig);
 router.get('/owncloud/update-route/:domain', updateOcRoute);
+router.get('/loggo/:message', loggo);
 
 export default router;
