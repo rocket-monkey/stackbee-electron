@@ -5,14 +5,17 @@ import mongoose from 'mongoose';
 import aws from 'aws-sdk';
 import { connectDb } from '../../../shared/db';
 import User from '../../../shared/db/schema/user';
+
 import {
   exec,
   addSlashes,
 } from '../../../shared/utils';
+
 import {
   createTaskDef,
   waitForTaskRun,
 } from './utils';
+
 import {
   RDS_PROD_DATABASE,
   OWNCLOUD_CLUSTER_NAME,
@@ -21,10 +24,37 @@ import {
   OWNCLOUD_SSL_CERT_ID,
 } from '../../../shared/constants';
 
+import awsConfig from '../../../shared/awsCredentials';
+
+aws.config.update(awsConfig);
+
 const ecs = new aws.ECS();
 const ec2 = new aws.EC2();
 const elb = new aws.ELB();
-const cwe = new AWS.CloudWatchEvents();
+const cwe = new aws.CloudWatchEvents();
+
+export const updateTaskDefinition = (domain) => {
+  connectDb();
+
+  // find the user
+  User.findOne({
+    domain,
+  }, (err, user) => {
+
+    if (err) throw err;
+
+    createTaskDef(user, ecs, (taskDefResult) => {
+      if (taskDefResult) {
+        mongoose.connection.close();
+        return
+      }
+
+      console.log('could not update task definition! 😖'.red);
+      mongoose.connection.close();
+    });
+
+  });
+};
 
 export const processNewOcUsers = (users, callback) => {
   connectDb();
@@ -129,7 +159,7 @@ const processUsers = (users, callback) => {
                       const params = {
                         Listeners: [
                           {
-                          Protocol: "HTTPS"
+                          Protocol: "HTTPS",
                           LoadBalancerPort: user.owncloudMeta.port,
                           InstancePort: user.owncloudMeta.port,
                           InstanceProtocol: "HTTP",
@@ -151,19 +181,17 @@ const processUsers = (users, callback) => {
                               console.log('could not start task! mostly because no machine is available anymore!'.red);
 
                               const params = {
-                                Entries:
-                                  {
-                                    Detail: {
-                                      clusterName: OWNCLOUD_CLUSTER_NAME,
-                                      serviceName: `${customer}-owncloud`,
-                                      comparisonOperator: '++',
-                                    },
-                                    DetailType: 'oc-task-not-starting',
-                                    Resources: [`${customer}-owncloud`, OWNCLOUD_CLUSTER_NAME],
-                                    Source: 'io.stackbee.owncloud',
-                                    Time: new Date || 'Wed Dec 31 1969 16:00:00 GMT-0800 (PST)' || 123456789
+                                Entries: {
+                                  Detail: {
+                                    clusterName: OWNCLOUD_CLUSTER_NAME,
+                                    serviceName: `${customer}-owncloud`,
+                                    comparisonOperator: '++',
                                   },
-                                ]
+                                  DetailType: 'oc-task-not-starting',
+                                  Resources: [`${customer}-owncloud`, OWNCLOUD_CLUSTER_NAME],
+                                  Source: 'io.stackbee.owncloud',
+                                  Time: new Date || 'Wed Dec 31 1969 16:00:00 GMT-0800 (PST)' || 123456789
+                                },
                               };
                               cwe.putEvents(params, (err, data) => {
                                 if (err) return console.log(err, err.stack); // an error occurred

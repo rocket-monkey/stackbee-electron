@@ -1,8 +1,10 @@
 import User from '../../../../shared/db/schema/user';
+
 import {
   exec,
   addSlashes,
 } from '../../../../shared/utils';
+
 import {
   OWNCLOUD_CLUSTER_NAME,
 } from '../../../../shared/constants';

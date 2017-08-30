@@ -69,6 +69,15 @@ export const createTaskDef = (user, ecs, callback) => {
   // ));
 
   const params = {
+    family: `${user.name}-owncloud`,
+    volumes: [
+      {
+        'name': 'efs',
+        'host': {
+          'sourcePath': `/mnt/efs/owncloud/${user.domain}`
+        }
+      }
+    ],
     containerDefinitions: [
       {
         name: `sb-${user.name}-owncloud`,
@@ -104,20 +113,12 @@ export const createTaskDef = (user, ecs, callback) => {
           { name : 'DB_USER', value : user.owncloudMeta.dbUser },
           { name : 'DB_PASS', value : user.owncloudMeta.dbPassword }
         ],
-        volumes: [
-          {
-            'name': 'efs',
-            'host': {
-              'sourcePath': `/mnt/efs/owncloud/${user.domain}`
-            }
-          }
-        ],
         essential: true
       }
     ]
   };
 
-  ecs.registerTaskDefinition(params, (err, data) {
+  ecs.registerTaskDefinition(params, (err, data) => {
     if (err) {
       console.log(err, err.stack); // an error occurred
       return callback(false);

@@ -26,6 +26,11 @@ export const nginxProxyConf = (req, res, next) => {
 
       nginxConf += `
 server {
+  listen                80;
+  server_name           ${user.domain}.stackbee.cloud;
+  return                301 https://$server_name$request_uri;
+}
+server {
   listen                443 ssl;
   ssl                   on;
   ssl_certificate       /etc/ssl/cert_chain.crt;

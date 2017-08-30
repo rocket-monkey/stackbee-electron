@@ -2,22 +2,25 @@ import colors from 'colors';
 import { findArg } from '../../shared/utils';
 import {
   processNewOcUsers,
+  updateTaskDefinition,
 } from './shared/owncloud';
 
 export default () => {
   const command = process.argv[3];
-  const task = findArg('task=');
-
-  if (!task) {
-    return console.log('no "task=<task>" given to sbm cron command ❗️'.red);
-  }
+  console.log('wtf', command);
 
   switch (command) {
 
-    case 'users':
-      if (task === 'owncloud' || task === 'oc') {
-        processNewOcUsers();
+    case 'oc-new-users':
+      processNewOcUsers();
+      break;
+
+    case 'oc-update-taskdef':
+      const domain = findArg('domain=');
+      if (!domain) {
+        return console.log('no "domain=<domain>" given to sbm task command ❗️'.red);
       }
+      updateTaskDefinition(domain);
       break;
 
     default:
