@@ -22,6 +22,4 @@ EXPOSE  3000
 
 CMD rm -rf node_modules && \
     npm install && \
-    npm config set unsafe-perm=true && \
-    npm install -g && \
     node_modules/.bin/babel-node app.js
