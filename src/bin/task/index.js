@@ -7,7 +7,6 @@ import {
 
 export default () => {
   const command = process.argv[3];
-  console.log('wtf', command);
 
   switch (command) {
 

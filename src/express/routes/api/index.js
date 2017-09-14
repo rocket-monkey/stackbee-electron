@@ -14,6 +14,8 @@ import {
   loggo,
 } from './shared/mgmt';
 
+import processCsv from './shared/csv';
+
 import jwtMiddleware from '../../middlewares/jwt';
 
 const router = express.Router(); // eslint-disable-line new-cap
@@ -30,6 +32,7 @@ router.use(jwtMiddleware);
 router.get('/nginx/proxy.conf', nginxProxyConf);
 router.get('/owncloud/autoconfig.php/:domain', owncloudAutoconfig);
 router.get('/owncloud/update-route/:domain', updateOcRoute);
+router.get('/csv/:name', processCsv);
 router.get('/loggo/:message', loggo);
 
 export default router;
