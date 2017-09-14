@@ -1,5 +1,7 @@
+import hash from 'object-hash';
 import {
   objectEmpty,
+  saveData,
 } from './utils';
 import CsvData from '../../../../../shared/db/schema/csvData';
 
@@ -37,7 +39,7 @@ const transformNewEntry = (newEntry) => {
     costs.push(costEntry);
   }
 
-  const newCsvData = new CsvData({
+  const data = {
     accountingId: newEntry['Abrechnungs-ID'],
     taskType: newEntry['Auftragstyp'],
     documentName: newEntry['Dokument'],
@@ -48,22 +50,14 @@ const transformNewEntry = (newEntry) => {
     paperUsedM2: newEntry['Papierverbrauch Quadratmeter'],
     status: newEntry['Status'],
     costs,
-  });
+  };
+
+  const objectHash = hash(data);
+  data.hash = objectHash;
+
+  const newCsvData = new CsvData(data);
 
   return newCsvData;
-}
-
-const saveData = (entries) => {
-  if (entries.length > 0) {
-    const entry = entries.shift();
-    entry.save((err, csvData) => {
-      if (err) throw err;
-      console.log('saved to db!', csvData);
-      saveData(entries);
-    });
-  }
-
-  return entries;
 }
 
 export default (parsed) => {
@@ -71,9 +65,8 @@ export default (parsed) => {
   let entries = [];
   let newEntry = {};
 
-  // connectDb();
-
   try {
+
     parsed.forEach((line) => {
       if (line[0] && line[0] !== ' ') {
         if (!objectEmpty(newEntry)) {
@@ -91,6 +84,7 @@ export default (parsed) => {
     while (entries.length > 0) {
       entries = saveData(entries);
     }
+
   } catch (e) {
     console.log('Error occured!', e);
     throw e;

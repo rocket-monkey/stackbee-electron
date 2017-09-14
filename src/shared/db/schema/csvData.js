@@ -4,17 +4,18 @@ const Schema = mongoose.Schema;
 
 // create a schema
 const csvDataSchema = new Schema({
-  accountingId       : { type: String },
-  taskType           : { type: String, required: true },
-  documentName       : { type: String, required: true },
-  printDate          : { type: String, required: true },
-  printQuality       : { type: String, required: true },
-  copies             : { type: Number, required: true },
-  paperType          : { type: String, required: true },
-  paperUsedM2        : { type: String, required: true },
-  status             : { type: String, required: true },
-  costs              : { type: Array, default: [], required: true },
-  createdAt          : { type: Date, default: Date.now },
+  hash                : { type: String, required: true, unique: true },
+  accountingId        : { type: String },
+  taskType            : { type: String, required: true },
+  documentName        : { type: String, required: true },
+  printDate           : { type: String, required: true },
+  printQuality        : { type: String, required: true },
+  copies              : { type: Number, required: true },
+  paperType           : { type: String, required: true },
+  paperUsedM2         : { type: String, required: true },
+  status              : { type: String, required: true },
+  costs               : { type: Array, default: [], required: true },
+  createdAt           : { type: Date, default: Date.now },
 });
 
 // the schema is useless so far

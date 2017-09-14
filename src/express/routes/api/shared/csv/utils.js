@@ -1,3 +1,4 @@
+import CsvData from '../../../../../shared/db/schema/csvData';
 import processDefault from './processDefault';
 
 const typeDefaultConfig = {
@@ -31,4 +32,25 @@ export const objectEmpty = (object) => {
   }
 
   return count === 0;
+};
+
+export const saveData = (entries) => {
+  if (entries.length > 0) {
+    const entry = entries.shift();
+
+    CsvData
+      .find({ hash: entry.hash })
+      .exec((error, datas) => {
+        if (datas.length > 0) {
+          return console.log('Entry already exists!', entry.hash);
+        }
+
+        entry.save((err, csvData) => {
+          if (err) throw err;
+          saveData(entries);
+        });
+      });
+  }
+
+  return entries;
 };
