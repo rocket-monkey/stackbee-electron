@@ -16,6 +16,11 @@ import {
 
 import processCsv from './shared/csvOld';
 import postCsv from './shared/csv';
+import printerUpload, {
+  printerUploadS3,
+  printerUploadMiddleware,
+  printerUploadMiddlewareS3,
+} from './shared/printerUpload';
 
 import jwtMiddleware from '../../middlewares/jwt';
 
@@ -35,6 +40,8 @@ router.get('/owncloud/autoconfig.php/:domain', owncloudAutoconfig);
 router.get('/owncloud/update-route/:domain', updateOcRoute);
 router.get('/csv/:name', processCsv);
 router.post('/post-csv', postCsv);
+router.post('/printer-upload', printerUploadMiddleware.array('files', 3), printerUpload);
+router.post('/printer-upload-s3', printerUploadMiddlewareS3.array('files', 3), printerUploadS3);
 router.get('/loggo/:message', loggo);
 
 export default router;
