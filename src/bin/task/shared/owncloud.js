@@ -128,6 +128,7 @@ const processUsers = (users, callback) => {
         user.owncloudMeta.dbName = dbName;
         user.owncloudMeta.dbUser = dbUser;
         user.owncloudMeta.dbPassword = dbPassword;
+        user.owncloudMeta.dbHost = RDS_PROD_DATABASE;
 
         createTaskDef(user, ecs, (taskDefResult) => {
           if (taskDefResult) {
@@ -144,106 +145,98 @@ const processUsers = (users, callback) => {
                 user.save((err, user) => {
                   if (err) { return console.log('Could not save user!', err); }
 
-                  // run new task in this service
-                  ecs.runTask({
-                    cluster: OWNCLOUD_CLUSTER_NAME,
-                    taskDefinition: `${user.name}-owncloud`
+                  ec2.authorizeSecurityGroupIngress({
+                    GroupId: OWNCLOUD_SECURITY_GROUP_ID,
+                    IpProtocol: 'tcp',
+                    FromPort: user.owncloudMeta.port,
+                    ToPort: user.owncloudMeta.port,
+                    CidrIp: '0.0.0.0/0'
                   }, (err, data) => {
-                    if (err) return console.log(err, err.stack); // an error occurred
+                    if (err) return console.log('FUCK', err, err.stack); // an error occurred
 
-                    ec2.authorizeSecurityGroupIngress({
-                      GroupId: OWNCLOUD_SECURITY_GROUP_ID,
-                      IpProtocol: 'tcp',
-                      FromPort: user.owncloudMeta.port,
-                      ToPort: user.owncloudMeta.port,
-                      CidrIp: '0.0.0.0/0'
-                    }, (err, data) => {
-                      if (err) return console.log('FUCK', err, err.stack); // an error occurred
-
-                      const params = {
-                        Listeners: [
-                          {
+                    const params = {
+                      Listeners: [
+                        {
                           Protocol: "HTTPS",
                           LoadBalancerPort: user.owncloudMeta.port,
                           InstancePort: user.owncloudMeta.port,
                           InstanceProtocol: "HTTP",
                           SSLCertificateId: OWNCLOUD_SSL_CERT_ID,
                         }
-                        ],
-                        LoadBalancerName: OWNCLOUD_LOAD_BALANCER_NAME
-                      };
-                      elb.createLoadBalancerListeners(params, (err, data) => {
-                        if (err) return console.log(err, err.stack); // an error occurred
+                      ],
+                      LoadBalancerName: OWNCLOUD_LOAD_BALANCER_NAME
+                    };
+                    elb.createLoadBalancerListeners(params, (err, data) => {
+                      if (err) return console.log(err, err.stack); // an error occurred
 
-                        console.log('try to wait for task start..'.blue);
+                      console.log('try to wait for task start..'.blue);
 
-                        setTimeout(() => {
-                          ecs.listTasks({ cluster: OWNCLOUD_CLUSTER_NAME, serviceName: `${customer}-owncloud` }, (err, data) => {
-                            if (err) return console.log(err, err.stack); // an error occurred
+                      setTimeout(() => {
+                        ecs.listTasks({ cluster: OWNCLOUD_CLUSTER_NAME, serviceName: `${customer}-owncloud` }, (err, data) => {
+                          if (err) return console.log(err, err.stack); // an error occurred
 
-                            if (data.taskArns.length === 0) {
-                              console.log('could not start task! mostly because no machine is available anymore!'.red);
+                          if (data.taskArns.length === 0) {
+                            console.log('could not start task! mostly because no machine is available anymore!'.red);
 
-                              const eventDetail = {
-                                clusterName: OWNCLOUD_CLUSTER_NAME,
-                                serviceName: `${customer}-owncloud`,
-                                comparisonOperator: '++',
-                              };
-                              const eventDetailStr = JSON.stringify(eventDetail);
-                              const params = {
-                                Entries: [{
-                                  Detail: eventDetailStr,
-                                  DetailType: 'json',
-                                  Resources: [`${customer}-owncloud`, OWNCLOUD_CLUSTER_NAME],
-                                  Source: 'io.stackbee.owncloud',
-                                  Time: new Date || 'Wed Dec 31 1969 16:00:00 GMT-0800 (PST)' || 123456789,
-                                }],
-                              };
-                              cwe.putEvents(params, (err, data) => {
-                                if (err) return console.log(err, err.stack); // an error occurred
+                            const eventDetail = {
+                              clusterName: OWNCLOUD_CLUSTER_NAME,
+                              serviceName: `${customer}-owncloud`,
+                              comparisonOperator: '++',
+                            };
+                            const eventDetailStr = JSON.stringify(eventDetail);
+                            const params = {
+                              Entries: [{
+                                Detail: eventDetailStr,
+                                DetailType: 'json',
+                                Resources: [`${customer}-owncloud`, OWNCLOUD_CLUSTER_NAME],
+                                Source: 'io.stackbee.owncloud',
+                                Time: new Date || 'Wed Dec 31 1969 16:00:00 GMT-0800 (PST)' || 123456789,
+                              }],
+                            };
+                            cwe.putEvents(params, (err, data) => {
+                              if (err) return console.log(err, err.stack); // an error occurred
 
-                                if (isLastUser) callback();
-                              });
-                              return;
-                            } else {
-                              console.log('service successfully setup! 🎉'.green);
                               if (isLastUser) callback();
-                            }
+                            });
+                            return;
+                          } else {
+                            console.log('service successfully setup! 🎉'.green);
+                            if (isLastUser) callback();
+                          }
 
-                            // we don't need this anymore -> on startup of a nextcloud server
-                            // --> we make an API call to our node-manager who will do exactly this at this moment (when it's actually running)
-                            // ---> all 15min a cronjob will run on nginx to grab the latest proxy config.. ;)
+                          // we don't need this anymore -> on startup of a nextcloud server
+                          // --> we make an API call to our node-manager who will do exactly this at this moment (when it's actually running)
+                          // ---> all 15min a cronjob will run on nginx to grab the latest proxy config.. ;)
 
-                            // data.taskArns.forEach((taskArn) => {
-                            //   waitForTaskRun(ecs, taskArn, (task) => {
+                          // data.taskArns.forEach((taskArn) => {
+                          //   waitForTaskRun(ecs, taskArn, (task) => {
 
-                            //     // TODO: refactor
-                            //     const containerInstancesRes = JSON.parse(exec(
-                            //       `aws ecs describe-container-instances --cluster ${OWNCLOUD_CLUSTER_NAME} --container-instances ${task.containerInstanceArn}`
-                            //     ));
-                            //     const containerInstance = containerInstancesRes.containerInstances.pop();
-                            //     const ec2InstanceRes = JSON.parse(exec(
-                            //       `aws ec2 describe-instances --instance-ids ${containerInstance.ec2InstanceId}`
-                            //     ));
-                            //     const reservations = ec2InstanceRes.Reservations.pop();
-                            //     const instance = reservations.Instances.pop();
-                            //     user.owncloudMeta.route = `${instance.PublicIpAddress}:${user.owncloudMeta.port}`;
+                          //     // TODO: refactor
+                          //     const containerInstancesRes = JSON.parse(exec(
+                          //       `aws ecs describe-container-instances --cluster ${OWNCLOUD_CLUSTER_NAME} --container-instances ${task.containerInstanceArn}`
+                          //     ));
+                          //     const containerInstance = containerInstancesRes.containerInstances.pop();
+                          //     const ec2InstanceRes = JSON.parse(exec(
+                          //       `aws ec2 describe-instances --instance-ids ${containerInstance.ec2InstanceId}`
+                          //     ));
+                          //     const reservations = ec2InstanceRes.Reservations.pop();
+                          //     const instance = reservations.Instances.pop();
+                          //     user.owncloudMeta.route = `${instance.PublicIpAddress}:${user.owncloudMeta.port}`;
 
-                            //     console.log('task successfully started! 🎉'.green);
+                          //     console.log('task successfully started! 🎉'.green);
 
-                            //     user.markModified('owncloudMeta');
-                            //     user.save((err, user) => {
-                            //       if (err) { return console.log('Could not save user!', err); }
-                            //       console.log(`User updated with serviceArn "${user.owncloudMeta.serviceArn}"`.green);
-                            //       if (isLastUser) callback();
-                            //     });
+                          //     user.markModified('owncloudMeta');
+                          //     user.save((err, user) => {
+                          //       if (err) { return console.log('Could not save user!', err); }
+                          //       console.log(`User updated with serviceArn "${user.owncloudMeta.serviceArn}"`.green);
+                          //       if (isLastUser) callback();
+                          //     });
 
-                            //   });
-                            // });
-                          });
+                          //   });
+                          // });
+                        });
 
-                        }, 8000);
-                      });
+                      }, 8000);
                     });
                   });
 
