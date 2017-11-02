@@ -1,6 +1,15 @@
 import CsvData from '../../../../../shared/db/schema/csvData';
+import processDefault from './processDefault';
 
 const debug = false;
+
+export const getProcessByType = (csvType) => {
+  switch (csvType) {
+    case 'default':
+    default:
+      return processDefault;
+  }
+}
 
 export const saveEntries = (entries) => {
   if (entries.length > 0) {

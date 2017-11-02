@@ -1,7 +1,11 @@
+import fs from 'fs';
 import aws from 'aws-sdk';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
-// import xlsjs from 'xls-to-json';
+import tableToCsv from 'node-table-to-csv';
+import {
+  getProcessByType
+} from '../csv/utils';
 import awsConfig from '../../../../../shared/awsCredentials';
 
 aws.config.update(awsConfig);
@@ -54,6 +58,24 @@ export default (req, res, next) => {
 
   req.files.forEach((file) => {
     console.log('file', file);
+    fs.readFile(file.path, 'utf8', (err, data) => {
+      if (err) {
+        console.log('err', err);
+        return;
+      }
+
+      if (data.indexOf('<html>') > -1) {
+        // html file content detected!
+        const csvData = tableToCsv(data);
+        console.log('csv?', csvData.length);
+
+        const csvType = 'default';
+        const processFunction = getProcessByType(csvType);
+        const entries = processFunction.apply(undefined, [csvData]);
+        res.send(entries);
+      }
+
+    });
     // xlsjs({
     //   input: file.path,
     // }, (err, results) => {
@@ -61,5 +83,5 @@ export default (req, res, next) => {
     //   console.log('results', results);
     // });
   });
-  res.send(`Successfully uploaded ${req.files.length} files!`);
+  // res.send(`Successfully uploaded ${req.files.length} files!`);
 };
