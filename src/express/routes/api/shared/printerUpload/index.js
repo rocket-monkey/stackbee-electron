@@ -3,7 +3,9 @@ import aws from 'aws-sdk';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 import tableToCsv from 'node-table-to-csv';
+import parse from 'csv-parse';
 import {
+  getConfigByType,
   getProcessByType
 } from '../csv/utils';
 import awsConfig from '../../../../../shared/awsCredentials';
@@ -48,6 +50,14 @@ export const printerUploadS3 = (req, res, next) => {
   res.send(`Successfully uploaded ${req.files.length} files!`);
 };
 
+const getCsvTypeByFile = (file) => {
+  if (file.originalname.indexOf('L25500') > -1) {
+    return 'L25500';
+  }
+
+  return 'default';
+}
+
 export default (req, res, next) => {
   if (req.decoded.email !== 'admin@stackbee.io') {
     return res.status(403).send({
@@ -67,12 +77,24 @@ export default (req, res, next) => {
       if (data.indexOf('<html>') > -1) {
         // html file content detected!
         const csvData = tableToCsv(data);
-        console.log('csv?', csvData.length);
+        const csvType = getCsvTypeByFile(file);
 
-        const csvType = 'default';
-        const processFunction = getProcessByType(csvType);
-        const entries = processFunction.apply(undefined, [csvData]);
-        res.send(entries);
+        parse(csvData, getConfigByType(csvType), (err, parsed) => {
+          if (err) throw err;
+
+          // console.log('csvType', csvType);
+          console.log('parsed', parsed);
+
+          const processFunction = getProcessByType(csvType);
+          const entries = processFunction.apply(undefined, [parsed]);
+          res.send(entries);
+        });
+        // console.log('csv?', csvData.length);
+
+        // const csvType = 'default';
+        // const processFunction = getProcessByType(csvType);
+        // const entries = processFunction.apply(undefined, [csvData]);
+        // res.send(typeof csvData);
       }
 
     });

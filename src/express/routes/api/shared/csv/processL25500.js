@@ -1,13 +1,18 @@
 import hash from 'object-hash';
 import {
   objectEmpty,
-  saveData,
+  saveEntries,
 } from './utils';
 import CsvData from '../../../../../shared/db/schema/csvData';
 
 const processLine = (newEntry, line, fieldDefs) => {
+  let isInkSpecialCase = false;
+  if (line[0].indexOf('Tinte') > -1) {
+    isInkSpecialCase = true;
+  }
+
   line.forEach((value, index) => {
-    const fieldDef = fieldDefs[index];
+    const fieldDef = isInkSpecialCase && index === 3 ? 'Verbrauchte Tinte ml' : fieldDefs[index];
     if (value && value !== ' ') {
       if (newEntry[fieldDef]) {
         if (typeof newEntry[fieldDef].push !== 'function') {
@@ -28,8 +33,8 @@ const processLine = (newEntry, line, fieldDefs) => {
 const transformNewEntry = (newEntry) => {
   const costs = [];
 
-  for (let i = newEntry['Verbrauchte Tinte ml'].length - 1, len = 0; i >= len; i -= 1) {
-    const inkUsedMl = newEntry['Verbrauchte Tinte ml'][i];
+  for (let i = newEntry['Verbrauchte Tinte ml'].length - 1, len = 0; i >= len; i -= 1) {
+    const inkUsedMl = newEntry['Verbrauchte Tinte ml'][i];
     let inkType = newEntry['Kostenart'].pop();
     if (inkType.indexOf('-') > -1) {
       inkType = inkType.split('-')[1].trim();
@@ -40,18 +45,23 @@ const transformNewEntry = (newEntry) => {
       inkType,
       inkValue,
     };
-    costs.push(costEntry);
+
+    if (inkType !== 'Sonstige') {
+      costs.push(costEntry);
+    }
   }
 
+  // missing:
+  // accountingId
+  // taskType
+  // copies
+
   const data = {
-    accountingId: newEntry['Abrechnungs-ID'],
-    taskType: newEntry['Auftragstyp'],
     documentName: newEntry['Dokument'],
     printDate: newEntry['Druckdatum'],
-    printQuality: newEntry['Druckqualität'],
-    copies: parseInt(newEntry['Exemplare'], 10),
-    paperType: newEntry['Papiersorte'],
-    paperUsedM2: newEntry['Papierverbrauch Quadratmeter'],
+    printQuality: newEntry['Druckmodus'],
+    paperType: newEntry['Druckmaterialsorte'],
+    paperUsedM2: newEntry['Druckmaterialverbrauch Quadratmeter'],
     status: newEntry['Status'],
     costs,
   };
@@ -72,7 +82,7 @@ export default (parsed) => {
   try {
 
     parsed.forEach((line) => {
-      if (line[0] && line[0] !== ' ') {
+      if (line[2]) {
         if (!objectEmpty(newEntry)) {
           // save new entry to return array
           entries.push(transformNewEntry(newEntry));
@@ -86,7 +96,7 @@ export default (parsed) => {
     });
 
     while (entries.length > 0) {
-      entries = saveData(entries);
+      entries = saveEntries(entries);
     }
 
   } catch (e) {

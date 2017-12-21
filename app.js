@@ -1,10 +1,10 @@
-import colors from 'colors';
-import express from 'express';
-import bodyParser from 'body-parser';
-import morgan from 'morgan';
-import { connectDb } from './src/shared/db';
-import { initSalt } from './src/shared/db/shared/utils';
-import api from './src/express/routes/api';
+var colors = require('colors');
+var express = require('express');
+var bodyParser = require('body-parser');
+var morgan = require('morgan');
+var connectDb = require('./lib/shared/db').connectDb;
+var initSalt = require('./lib/shared/db/shared/utils').initSalt;
+var api = require('./lib/express/routes/api').default;
 
 const app = express();
 
@@ -35,7 +35,7 @@ app.use(morgan('dev'));
 // =======================
 
 // basic route (useful for a possible health-check)
-app.get('/', (req, res) => {
+app.get('/', function(req, res) {
   res.send('Hello World!');
 });
 
@@ -46,7 +46,7 @@ app.use('/api', api);
 // start the server ======
 // =======================
 
-app.listen(port, () => {
+app.listen(port, function() {
   connectDb();
 
   initSalt();
