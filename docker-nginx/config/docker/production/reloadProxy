@@ -1,0 +1,2 @@
+#!/bin/sh
+wget http://node.stackbee.cloud/api/nginx/proxy.conf?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQHN0YWNrYmVlLmlvIiwicm9sZXMiOlsiYWRtaW4iXSwiaWF0IjoxNDk3NjQ0MTgyfQ.vBpRonrwXE2EU96NUWJT0nA9eTCpBlyjn678fAgNOO8 -O /etc/nginx/conf.d/proxy.conf && /usr/sbin/nginx -s reload >> /var/log/cron.log
