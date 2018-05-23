@@ -121,7 +121,7 @@ const processUsers = (users, callback) => {
           `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "CREATE USER ${dbUser}@'%' IDENTIFIED BY '${dbPassword}'"`
         );
         exec(
-          `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "GRANT SELECT, INSERT, UPDATE, CREATE, DELETE ON ${dbName}.* TO '${dbUser}'@'%'"`
+          `mysql -u ${mysqlUser} -h ${host} -p${mysqlPw} -e "GRANT SELECT, INSERT, UPDATE, INDEX, ALTER, CREATE, DELETE ON ${dbName}.* TO '${dbUser}'@'%'"`
         );
         console.log(`new database name: ${dbName}, user: ${dbUser} 👊`.green);
 

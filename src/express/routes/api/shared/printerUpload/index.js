@@ -86,8 +86,8 @@ export default (req, res, next) => {
           console.log('parsed', parsed);
 
           const processFunction = getProcessByType(csvType);
-          const entries = processFunction.apply(undefined, [parsed]);
-          res.send(entries);
+          processFunction.apply(undefined, [parsed]);
+          res.send(true);
         });
         // console.log('csv?', csvData.length);
 

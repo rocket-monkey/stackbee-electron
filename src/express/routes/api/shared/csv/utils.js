@@ -41,7 +41,7 @@ export const objectEmpty = (object) => {
   return count === 0;
 }
 
-export const saveEntries = (entries) => {
+export const saveEntries = (entries, callback) => {
   if (entries.length > 0) {
     const entry = entries.shift();
 
@@ -49,7 +49,8 @@ export const saveEntries = (entries) => {
       .find({ hash: entry.hash })
       .exec((error, datas) => {
         if (datas.length > 0) {
-          return debug && console.log('Entry already exists!', entry.hash);
+          debug && console.log('Entry already exists!', entry.hash);
+          return saveEntries(entries);
         }
 
         entry.save((err, csvData) => {
@@ -57,7 +58,7 @@ export const saveEntries = (entries) => {
           saveEntries(entries);
         });
       });
+  } else {
+    callback();
   }
-
-  return entries;
 };

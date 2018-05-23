@@ -33,3 +33,18 @@ Scripts and Express endpoints for the managing server of stackbee.io, based on n
 
 ### <hgo-manager-domain>/api/nginx/conf
 `Returns the "proxy.conf" configuration file for our nginx owncloud redirect solution`
+## Upgrade nextloud
+
+- the wrong way... 😂
+1. ssh into ec2 instance (remember it's `ec2-user@`), exec `docker ps`, get into the docker instance with `docker exec it <instance-id> bash`
+2. go into dir `/usr/src/` where the `nextcloud` folder is.. delete the existing nextcloud folder `rm -rf nextcloud`
+3. get the latest tar.bz2 install archive from `https://nextcloud.com/instal` with `wget`
+4. untar it with `tar xvjf <tar-file>`
+5. check for user installed apps in `/var/www/html/apps` and backup them
+6. sync it over with `rsync -a --delete --exclude /config/ --exclude /data/ --exclude /custom_apps/ --exclude /themes/ /usr/src/nextcloud/ /var/www/html/`
+7. re-visit the domain - the upgrade wizard must be there
+
+- the right way
+1. rebuild the docker image `hgo-docker-nextcloud` and publish it
+2. restart the desired task
+3. re-visit the domain - the upgrade wizard must be there

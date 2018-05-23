@@ -72,7 +72,7 @@ $AUTOCONFIG = array(
   "dbtableprefix" => "oc_",
   "adminlogin"    => "admin",
   "adminpass"     => "${user.owncloudMeta.adminPass}",
-  "directory"     => "/efs/data",
+  "directory"     => "/efs/data"
 );
   `;
     res.send(content);

@@ -12,7 +12,7 @@ const processLine = (newEntry, line, fieldDefs) => {
   }
 
   line.forEach((value, index) => {
-    const fieldDef = isInkSpecialCase && index === 3 ? 'Verbrauchte Tinte ml' : fieldDefs[index];
+    const fieldDef = isInkSpecialCase && index === 3 ? 'Verbrauchte Tinte ml' : fieldDefs[index];
     if (value && value !== ' ') {
       if (newEntry[fieldDef]) {
         if (typeof newEntry[fieldDef].push !== 'function') {
@@ -33,8 +33,8 @@ const processLine = (newEntry, line, fieldDefs) => {
 const transformNewEntry = (newEntry) => {
   const costs = [];
 
-  for (let i = newEntry['Verbrauchte Tinte ml'].length - 1, len = 0; i >= len; i -= 1) {
-    const inkUsedMl = newEntry['Verbrauchte Tinte ml'][i];
+  for (let i = newEntry['Verbrauchte Tinte ml'].length - 1, len = 0; i >= len; i -= 1) {
+    const inkUsedMl = newEntry['Verbrauchte Tinte ml'][i];
     let inkType = newEntry['Kostenart'].pop();
     if (inkType.indexOf('-') > -1) {
       inkType = inkType.split('-')[1].trim();
@@ -61,8 +61,10 @@ const transformNewEntry = (newEntry) => {
     printDate: newEntry['Druckdatum'],
     printQuality: newEntry['Druckmodus'],
     paperType: newEntry['Druckmaterialsorte'],
-    paperUsedM2: newEntry['Druckmaterialverbrauch Quadratmeter'],
+    paperUsedM2: newEntry['Druckmaterialverbrauch Quadratmeter'],
     status: newEntry['Status'],
+    copies: 1,
+    taskType: 'Drucken',
     costs,
   };
 

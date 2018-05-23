@@ -85,9 +85,10 @@ export default (parsed) => {
       newEntry = processLine(newEntry, line, fieldDefs);
     });
 
-    while (entries.length > 0) {
-      entries = saveData(entries);
-    }
+    const entriesCount = entries.length;
+    saveEntries(entries, () => {
+      debug && console.log(`${entriesCount} entries saved!`);
+    });
 
   } catch (e) {
     console.log('Error occured!', e);

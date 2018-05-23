@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const csvDataSchema = new Schema({
   hash                : { type: String, required: true, unique: true },
   accountingId        : { type: String },
-  taskType            : { type: String, required: true },
+  taskType            : { type: String },
   documentName        : { type: String, required: true },
   printDate           : { type: String, required: true },
   printQuality        : { type: String, required: true },
