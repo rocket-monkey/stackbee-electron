@@ -76,6 +76,18 @@ export const createTaskDef = (user, ecs, callback) => {
         'host': {
           'sourcePath': `/mnt/efs/owncloud/${user.domain}`
         }
+      },
+      {
+        'name': 'efs-apps',
+        'host': {
+          'sourcePath': `/mnt/efs/nextcloud/${user.domain}/custom_apps`
+        }
+      },
+      {
+        'name': 'efs-theming',
+        'host': {
+          'sourcePath': `/mnt/efs/nextcloud/${user.domain}/theming`
+        }
       }
     ],
     containerDefinitions: [
@@ -88,6 +100,16 @@ export const createTaskDef = (user, ecs, callback) => {
           {
             containerPath: '/efs/data',
             sourceVolume: 'efs',
+            readOnly: false
+          },
+          {
+            containerPath: '/efs/custom_apps',
+            sourceVolume: 'efs-apps',
+            readOnly: false
+          },
+          {
+            containerPath: '/efs/theming',
+            sourceVolume: 'efs-theming',
             readOnly: false
           }
         ],

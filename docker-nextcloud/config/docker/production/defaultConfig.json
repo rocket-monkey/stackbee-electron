@@ -1,0 +1,15 @@
+{
+  "system": {
+    "mail_smtpdebug": false,
+    "mail_smtpmode": "smtp",
+    "mail_smtpauthtype": "LOGIN",
+    "mail_smtpauth": 1,
+    "mail_smtpname": "AKIAJPWKA3PH5HMILH7Q",
+    "mail_smtppassword": "As5HqpKZe+3AkKPoz6uXvpmc1gWoNC0n5f1Yk8ZZIDpW",
+    "mail_smtphost": "email-smtp.eu-west-1.amazonaws.com",
+    "mail_smtpport": 587,
+    "mail_smtpsecure": "tls",
+    "mail_domain": "stackbee.cloud",
+    "mail_from_address": "info"
+  }
+}

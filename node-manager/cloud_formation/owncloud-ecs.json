@@ -235,40 +235,6 @@
         }
       }
     },
-    "taskdefinition": {
-      "Type": "AWS::ECS::TaskDefinition",
-      "Properties": {
-        "ContainerDefinitions": [
-          {
-            "Name": "sbowncloud",
-            "Cpu": "10",
-            "Essential": "true",
-            "Image": "owncloud",
-            "Memory": "500",
-            "MountPoints": [
-              {
-                "ContainerPath": "/efs/data",
-                "SourceVolume": "efs-owncloud"
-              }
-            ],
-            "PortMappings": [
-              {
-                "HostPort": 80,
-                "ContainerPort": 80
-              }
-            ]
-          }
-        ],
-        "Volumes": [
-          {
-            "Host": {
-              "SourcePath": "/mnt/efs/owncloud/default"
-            },
-            "Name": "efs-owncloud"
-          }
-        ]
-      }
-    },
     "ECSAutoScalingGroup": {
       "Type": "AWS::AutoScaling::AutoScalingGroup",
       "DependsOn": [

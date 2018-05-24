@@ -5,6 +5,8 @@ import {
   startEcsNginx,
   startEcsOwncloud,
   startEcsOwncloudDeps,
+  updateEcsOwncloudDeps,
+  updateEcsOwncloud,
 } from './shared/createCluster';
 import {
   killEcsNodejs,
@@ -32,7 +34,17 @@ export default () => {
       } else if (name === 'nginx') {
         startEcsNginx();
       } else {
-        console.log('unknown name entered, possible values are: owncloud-deps (oc-deps), owncloud (oc), nodejs (node) 👍'.blue);
+        console.log('unknown name entered, possible values are: owncloud-deps (oc-deps), owncloud (oc), nodejs (node) or nginx 👍'.blue);
+      }
+      break;
+
+    case 'update':
+      if (name === 'owncloud-deps' || name === 'oc-deps') {
+        updateEcsOwncloudDeps();
+      } else if (name === 'owncloud' || name === 'oc') {
+        updateEcsOwncloud();
+      } else {
+        console.log('unknown name entered, possible values are: owncloud (oc) 👍'.blue);
       }
       break;
 

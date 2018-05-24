@@ -6,7 +6,7 @@ possible commands:
 
 - ecs [create name=<name>] kill name=<name>]
 - sbusr [create name=<name> domain=<domain> email=<email> pw=<password>] [kill email=<email>]
-- task [oc-new-users] [oc-update-taskdef domain=<domain>]
+- task [oc-new-users] [oc-sync-users] [oc-update-taskdef domain=<domain>]
 
   `);
 }

@@ -14,6 +14,12 @@ RUN apt-get update && \
 RUN a2enmod headers
 
 COPY apache2.conf /etc/apache2/apache2.conf
+COPY defaultConfig.json /var/www/defaultConfig.json
+RUN chown -R www-data:www-data /var/www/defaultConfig.json
+
+COPY bootstrap.php /var/www/bootstrap.php
+RUN chown -R www-data:www-data /var/www/bootstrap.php
+RUN chmod +x /var/www/bootstrap.php
 
 # Relocate the timezone file
 # RUN mkdir -p /config/etc && mv /etc/timezone /config/etc/ && ln -s /config/etc/timezone /etc/
@@ -23,7 +29,8 @@ COPY apache2.conf /etc/apache2/apache2.conf
 
 # Create the data folder if not exists
 RUN mkdir -p /efs/data
-RUN mkdir -p /efs/apps2
+RUN mkdir -p /efs/custom_apps
+RUN mkdir -p /efs/theming
 
 # WORKDIR /root
 # ADD .aws/credentials /root/.aws/

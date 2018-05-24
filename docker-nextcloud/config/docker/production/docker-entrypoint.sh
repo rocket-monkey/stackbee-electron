@@ -55,8 +55,11 @@ fi
 echo '--> chown /efs/data to www-data:nogroup for EFS..'
 chown www-data /efs/data
 
-echo '--> chown /efs/apps2 to www-data:nogroup for EFS..'
-chown www-data /efs/apps2
+echo '--> chown /efs/custom_apps to www-data:nogroup for EFS..'
+chown www-data /efs/custom_apps
+
+echo '--> chown /efs/theming to www-data:nogroup for EFS..'
+chown www-data /efs/theming
 
 # kill a possible admin user again in the db, for n- time deployment
 echo '--> delete possible existing "admin" user again..'
@@ -80,6 +83,12 @@ curl http://node.stackbee.cloud/api/owncloud/update-route/$CUSTOMER_DOMAIN?token
 echo ''
 echo '--> fix file permissions'
 chown -R www-data:www-data /var/www/html
+
+rm -r /var/www/html/custom_apps
+ln -s /efs/custom_apps /var/www/html/custom_apps
+chown -R www-data:www-data /var/www/html/custom_apps
+
+# sudo -u www-data ../bootstrap.php
 
 # by: http://www.digitalinternals.com/unix/linux-monitor-file-system-changes/397/
 inotifywait -mrq -e create /var/www/html/config | while read file; do (/on-config-create.sh $file&) done &

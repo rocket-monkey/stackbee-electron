@@ -1,8 +1,10 @@
 import colors from 'colors';
 import { findArg } from '../../shared/utils';
 import {
+  syncOcUsers,
   processNewOcUsers,
   updateTaskDefinition,
+  updateTaskDefinitions,
 } from './shared/owncloud';
 
 export default () => {
@@ -12,6 +14,14 @@ export default () => {
 
     case 'oc-new-users':
       processNewOcUsers();
+      break;
+
+    case 'oc-sync-users':
+      syncOcUsers();
+      break;
+
+    case 'oc-update-taskdefs-all':
+      updateTaskDefinitions();
       break;
 
     case 'oc-update-taskdef':
