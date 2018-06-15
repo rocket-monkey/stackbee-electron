@@ -25,6 +25,9 @@ if grep -q memcache "/var/www/html/config/config.php"; then
   echo '-> add trusted domain and apps_paths and import defaultConfig.json' &
   bash -c 'sleep 70; sudo -u www-data ./occ config:import /var/www/defaultConfig.json' &
   bash -c 'sleep 75; sudo -u www-data ./occ config:system:set trusted_domains 2 --value=$CUSTOMER_DOMAIN.stackbee.cloud'
+  bash -c 'sleep 80; sudo -u www-data ./occ app:install camerarawpreviews'
+  bash -c 'sleep 90; sudo -u www-data ./occ app:install metadata'
+  bash -c 'sleep 100; sudo -u www-data ./occ app:install richdocuments'
 
   # echo '-> uninstall sudo again'
   # apt-get -y remove sudo --force-yes

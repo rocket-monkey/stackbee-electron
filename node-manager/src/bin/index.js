@@ -3,6 +3,7 @@ import printManual from '../shared/printManual';
 import ecsService from './ecs/index';
 import sbusrService from './sbusr/index';
 import taskService from './task/index';
+import testAmazonOps from './test';
 
 const service = process.argv[2];
 
@@ -18,6 +19,10 @@ switch (service) {
 
   case 'task':
     taskService();
+    break;
+
+  case 'test':
+    testAmazonOps();
     break;
 
   case 'man':

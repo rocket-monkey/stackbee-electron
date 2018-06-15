@@ -1,0 +1,41 @@
+{
+  "name": "stackbee.io electron",
+  "version": "1.0.0",
+  "description": "A specialized Electron application for the customers of stackbee.io",
+  "main": "main/index.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "next build renderer && next export renderer",
+    "dist": "yarn run build && build"
+  },
+  "build": {
+  "files": [
+      "**/*",
+      "!renderer",
+      "renderer/out"
+    ]
+  },
+  "repository": "https://github.com/rocket-monkey/stackbee.io",
+  "bugs": {
+    "url": "https://github.com/rocket-monkey/stackbee.io/issues"
+  },
+  "homepage": "https://github.com/rocket-monkey/stackbee.io#readme",
+  "keywords": [
+    "Electron",
+    "stackbee.io"
+  ],
+  "author": "Remo Vetere",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "electron": "^2.0.0",
+    "electron-builder": "^20.15.1",
+    "next": "^6.0.4-canary.7",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1"
+  },
+  "dependencies": {
+    "app-root-path": "^2.0.1",
+    "electron-is-dev": "^0.3.0",
+    "electron-next": "^3.1.4"
+  }
+}
