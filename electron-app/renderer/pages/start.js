@@ -1,3 +1,5 @@
+import Layout from '@core/layout'
+
 export default () => (
-  <span>This is Next.js speaking</span>
+  <Layout>This is Next.js speaking</Layout>
 )

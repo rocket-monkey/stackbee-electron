@@ -14,7 +14,8 @@ app.on('ready', async () => {
 
   const mainWindow = new BrowserWindow({
     width: 800,
-    height: 600
+    height: 600,
+    titleBarStyle: 'hidden'
   })
 
   const devPath = 'http://localhost:8000/start'
