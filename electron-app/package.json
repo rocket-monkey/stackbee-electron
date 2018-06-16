@@ -7,7 +7,7 @@
     "start": "electron .",
     "intl:pot": "react-intl-po json2pot './src/@lang/.messages/**/*.json' -o './src/@lang/messages.pot'",
     "intl:json": "react-intl-po po2json './src/@lang/translations/messages.*.po' -m './src/@lang/.messages/**/*.json' -o './src/@lang/messages.json'",
-    "build": "next build renderer && next export renderer && yarn intl:deflang",
+    "build": "next build renderer && next export renderer",
     "dist": "yarn run build && build"
   },
   "build": {
