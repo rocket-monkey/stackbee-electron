@@ -38,6 +38,7 @@
   "dependencies": {
     "app-root-path": "^2.0.1",
     "electron-is-dev": "^0.3.0",
-    "electron-next": "^3.1.4"
+    "electron-next": "^3.1.4",
+    "styled-jsx": "^2.2.6"
   }
 }

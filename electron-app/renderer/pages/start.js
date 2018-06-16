@@ -1,5 +1,8 @@
 import Layout from '@core/layout'
+import Home from '@sites/home'
 
 export default () => (
-  <Layout>This is Next.js speaking</Layout>
+  <Layout>
+    <Home />
+  </Layout>
 )

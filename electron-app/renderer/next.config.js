@@ -5,8 +5,7 @@ const resolverOptions = {
   "cwd": "babelrc",
   "alias": {
     "@core": "./src/@core",
-    "@printers": "./src/@printers",
-    "@shared": "./src/@shared"
+    "@sites": "./src/@sites"
   }
 }
 
@@ -19,14 +18,21 @@ module.exports = {
     config.target = 'electron-renderer'
 
     config.resolve.alias['@core'] = path.resolve(__dirname, 'src', '@core')
-    defaultLoaders.babel.options.plugins = [["module-resolver", resolverOptions]]
-    console.log('defaultLoaders', defaultLoaders)
+
+    // Inject babel plugins, especially for our module-resolver and styled-jsx
+    defaultLoaders.babel.options.plugins = [
+      ['module-resolver', resolverOptions],
+      ['styled-jsx/babel', { 'optimizeForSpeed': true }],
+    ]
+
+    // As soon as we inject babel plugins, we have to add this rule otherwise JSX is suddenly unsupported oO
     config.module.rules.push({
       test: /\.+(js|jsx)$/,
       use: defaultLoaders.babel,
       include: [internalNodeModulesRegExp],
     })
-    // get aliases from .babelrc
+
+    // Get aliases from resolver options
     for (const key of Object.keys(resolverOptions.alias)) {
       config.resolve.alias[key] = path.resolve(__dirname, resolverOptions.alias[key])
     }
