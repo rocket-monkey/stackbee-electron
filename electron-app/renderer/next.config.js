@@ -4,8 +4,12 @@ const resolverOptions = {
   "root": ["."],
   "cwd": "babelrc",
   "alias": {
+    "@db": "./src/@db",
+    "@config": "./src/@config",
+    "@decorators": "./src/@decorators",
     "@core": "./src/@core",
-    "@sites": "./src/@sites"
+    "@sites": "./src/@sites",
+    "@printers": "./src/@printers"
   }
 }
 
