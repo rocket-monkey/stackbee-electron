@@ -9,6 +9,7 @@ const resolverOptions = {
     "@decorators": "./src/@decorators",
     "@core": "./src/@core",
     "@sites": "./src/@sites",
+    "@lang": "./src/@lang",
     "@printers": "./src/@printers"
   }
 }
@@ -16,7 +17,7 @@ const resolverOptions = {
 const internalNodeModulesRegExp = /src(?!\/(?!.*js))/
 
 module.exports = {
-  webpack(config, { defaultLoaders }) {
+  webpack(config, { defaultLoaders, dev }) {
     // Allows you to load Electron modules and
     // native Node.js ones into your renderer
     config.target = 'electron-renderer'
@@ -27,6 +28,7 @@ module.exports = {
     defaultLoaders.babel.options.plugins = [
       ['module-resolver', resolverOptions],
       ['styled-jsx/babel', { 'optimizeForSpeed': true }],
+      ['react-intl', { 'messagesDir': 'src/@lang/.messages/' }]
     ]
 
     // As soon as we inject babel plugins, we have to add this rule otherwise JSX is suddenly unsupported oO

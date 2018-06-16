@@ -7,6 +7,7 @@ const { BrowserWindow, app } = require('electron')
 const isDev = require('electron-is-dev')
 const prepareNext = require('electron-next')
 const { resolve } = require('app-root-path')
+const server = require('./server')
 
 const connectDb = require('../src/@db').connectDb
 
@@ -22,14 +23,12 @@ app.on('ready', async () => {
   })
 
   const devPath = 'http://localhost:8000/start'
+  const prodPath = 'http://localhost:8023/start/index.html'
 
-  const prodPath = format({
-    pathname: resolve('renderer/out/start/index.html'),
-    protocol: 'file:',
-    slashes: true
-  })
+  await connectDb()
+  await server(isDev)
 
-  connectDb()
+  global.isDev = isDev
 
   const url = isDev ? devPath : prodPath
   mainWindow.loadURL(url)

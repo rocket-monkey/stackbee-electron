@@ -1,15 +1,28 @@
 import { Component } from 'react'
 import DragArea from './dragArea'
+import Content from './content'
 export default class Layout extends Component {
+
   render () {
     return (
       <div>
         <DragArea />
-
-        {this.props.children}
+        <Content children={this.props.children} />
 
         <style jsx>{`
+          :global(html),
+          :global(body) {
+            height: calc(100vh - 16px);
+          }
+          :global(body > div) {
+            height: calc(100vh - 16px);
+          }
+          :global(body *) {
+            box-sizing: border-box;
+          }
+
           div {
+            height: 100%;
             padding: 18px 12px;
             position: relative;
             color: #ddd;

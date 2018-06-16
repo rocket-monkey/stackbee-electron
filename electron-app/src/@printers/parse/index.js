@@ -1,9 +1,9 @@
-import { Component } from 'react'
-import WithGlobals from '@decorators/withGlobals'
-import Alert from '@core/alert'
+import { Component, Fragment } from 'react'
+import { FormattedMessage } from 'react-intl'
+import { DbConnectionRequired } from '@core/alert'
 import { tryToParseFiles } from './parser'
 
-class PrintersParse extends Component {
+export default class PrintersParse extends Component {
 
   openFile = () => {
     const { dialog } = require('electron').remote
@@ -17,24 +17,16 @@ class PrintersParse extends Component {
   render () {
     const { globals, renderGlobals } = this.props
     return (
-      <div>
-        {
-          globals.dbConnected &&
-          <button onClick={this.openFile}>
-            Open File
-          </button>
-        }
-        {
-          !globals.dbConnected &&
-          <Alert>
-            No db connection - you are offline!
-          </Alert>
-        }
+      <Fragment>
+        <DbConnectionRequired {...globals} />
 
-        <p>{renderGlobals()}</p>
-      </div>
+        {globals.dbConnected &&
+        <button onClick={this.openFile}>
+          <FormattedMessage id='@printers.parse.index' defaultMessage='Open File' />
+        </button>}
+
+        <ul>{renderGlobals()}</ul>
+      </Fragment>
     )
   }
 }
-
-export default WithGlobals(PrintersParse)
