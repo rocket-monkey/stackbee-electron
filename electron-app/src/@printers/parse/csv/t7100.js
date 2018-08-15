@@ -1,9 +1,15 @@
 import hash from 'object-hash'
-import CsvData from '@db/schema/csvData'
-import {
-  saveData,
-  objectEmpty
-} from './utils'
+import getValueOfField from '@helpers/getValueOfField'
+
+const config = {
+  delimiter: ',',
+  comment: '#',
+  relax_column_count: true
+}
+
+const detectNewLine = (line) => (
+  line[0] && line[0] !== ' '
+)
 
 const processLine = (newEntry, line, fieldDefs) => {
   line.forEach((value, index) => {
@@ -38,8 +44,8 @@ const transformNewEntry = (newEntry) => {
     const costEntry = {
       inkUsedMl,
       inkType,
-      inkValue
-    }
+      inkValue,
+    };
     costs.push(costEntry)
   }
 
@@ -59,41 +65,12 @@ const transformNewEntry = (newEntry) => {
   const objectHash = hash(data)
   data.hash = objectHash
 
-  const newCsvData = new CsvData(data)
-
-  return newCsvData
+  return data
 }
 
-export default (parsed) => {
-  const fieldDefs = parsed.shift()
-  let entries = []
-  let newEntry = {}
-
-  try {
-
-    parsed.forEach((line) => {
-      if (line[0] && line[0] !== ' ') {
-        if (!objectEmpty(newEntry)) {
-          // save new entry to return array
-          entries.push(transformNewEntry(newEntry))
-
-          // reset object
-          newEntry = {}
-        }
-      }
-
-      newEntry = processLine(newEntry, line, fieldDefs)
-    });
-
-    const entriesCount = entries.length
-    saveEntries(entries, () => {
-      debug && console.log(`${entriesCount} entries saved!`)
-    })
-
-  } catch (e) {
-    console.log('Error occured!', e)
-    throw e
-  }
-
-  return entries
+export default {
+  config,
+  detectNewLine,
+  processLine,
+  transformNewEntry
 }

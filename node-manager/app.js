@@ -2,9 +2,9 @@ var colors = require('colors');
 var express = require('express');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
-var connectDb = require('./lib/shared/db').connectDb;
-var initSalt = require('./lib/shared/db/shared/utils').initSalt;
-var api = require('./lib/express/routes/api').default;
+var connectDb = require('./dist/shared/db').connectDb;
+var initSalt = require('./dist/shared/db/shared/utils').initSalt;
+var api = require('./dist/express/routes/api').default;
 
 const app = express();
 

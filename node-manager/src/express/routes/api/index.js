@@ -14,6 +14,8 @@ import {
   loggo,
 } from './shared/mgmt';
 
+import { saveCsvData } from './shared/mongoose'
+
 import processCsv from './shared/csvOld';
 import postCsv from './shared/csv';
 import printerUpload, {
@@ -42,6 +44,7 @@ router.get('/csv/:name', processCsv);
 router.post('/post-csv', postCsv);
 router.post('/printer-upload', printerUploadMiddleware.array('files', 3), printerUpload);
 router.post('/printer-upload-s3', printerUploadMiddlewareS3.array('files', 3), printerUploadS3);
+router.post('/csvdata', saveCsvData);
 router.get('/loggo/:message', loggo);
 
 export default router;

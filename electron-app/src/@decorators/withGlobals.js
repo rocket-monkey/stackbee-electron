@@ -13,19 +13,17 @@ const withGlobalsState = withState('globals', 'setGlobals', {})
 const withLifecycle = lifecycle({
   componentDidMount () {
     const { getGlobal } = require('electron').remote
-    const dbConnected = getGlobal('dbConnected')
     const isDev = getGlobal('isDev')
 
     this.props.setGlobals({
       isDev,
-      dbConnected,
       locale: navigator.language.split('-')[0]
     })
   }
 })
 
 const withRenderGlobals = withHandlers({
-  renderGlobals: ({ globals }) => () => Object.keys(globals).map(key => <li key={key}>{key}: {globals[key].toString()}</li>)
+  renderGlobals: ({ globals }) => () => Object.keys(globals).map(key => <span key={key}>{key}: {globals[key].toString()}&nbsp;</span>)
 })
 
 const withUpdateGlobals = withHandlers({

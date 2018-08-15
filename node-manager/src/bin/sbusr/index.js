@@ -13,11 +13,11 @@ export default () => {
   const email = findArg('email=');
   const pw = findArg('pw=');
 
-  if (!email && command !== 'hash') {
+  if (!email && command !== 'hash' && command !== 'kill') {
     return console.log('no "email=<email>" given to sbm sbusr command ❗️'.red);
   }
 
-  if (!pw && command !== 'hash') {
+  if (!pw && command !== 'hash' && command !== 'kill') {
     return console.log('no "pw=<password>" given to sbm sbusr command ❗️'.red);
   }
 

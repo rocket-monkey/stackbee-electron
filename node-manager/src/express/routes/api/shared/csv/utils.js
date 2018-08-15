@@ -1,6 +1,6 @@
 import CsvData from '../../../../../shared/db/schema/csvData';
-import processDefault from './processDefault';
-import processL25500 from './processL25500';
+import processDefault from './transformDefault';
+import processL25500 from './transformL25500';
 
 const debug = false;
 
