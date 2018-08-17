@@ -1,13 +1,32 @@
-import { Component } from 'react'
+import React, { Component } from 'react'
+import Link from 'next/link'
+import jwtDecode from 'jwt-decode'
+import { observable } from 'mobx'
+import { observer } from 'mobx-react'
 import DragArea from './dragArea'
+import AdminLink from './adminLink'
 import Content from './content'
-export default class Layout extends Component {
 
+export const appState = observable({
+  auth: 0
+})
+export default observer(
+class Layout extends Component {
   render () {
+    const { children, appState, isAdminRoute } = this.props
+
+    const mappedChildren = React.Children.map(children, child => {
+      return React.createElement(child.type, {...child.props, appState: this.props.appState}, child.props.children)
+    })
+
+    const decodedJwt = appState.auth.token && jwtDecode(appState.auth.token)
+    const isAdmin = decodedJwt && decodedJwt.roles.includes('admin')
+
     return (
       <div>
+        {isAdmin && <AdminLink isAdminRoute={isAdminRoute} />}
         <DragArea />
-        <Content children={this.props.children} />
+        <Content children={mappedChildren} />
 
         <style jsx>{`
           :global(html),
@@ -32,4 +51,4 @@ export default class Layout extends Component {
       </div>
     )
   }
-}
+})

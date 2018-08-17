@@ -4,11 +4,11 @@ import LoginRequired from '@core/loginRequired'
 
 export default class Home extends Component {
   render () {
-    const { globals, renderGlobals } = this.props
+    const { globals, renderGlobals, appState } = this.props
     return (
       <div>
         <h2>Home</h2>
-        <LoginRequired globals={globals} renderGlobals={renderGlobals}>
+        <LoginRequired appState={appState}>
           <PrinterParse globals={globals} renderGlobals={renderGlobals} />
         </LoginRequired>
       </div>
