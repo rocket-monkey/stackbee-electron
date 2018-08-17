@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import PrinterParse from '@printers/parse'
+import LoginRequired from '@core/loginRequired'
 
 export default class Home extends Component {
   render () {
@@ -7,7 +8,9 @@ export default class Home extends Component {
     return (
       <div>
         <h2>Home</h2>
-        <PrinterParse globals={globals} renderGlobals={renderGlobals} />
+        <LoginRequired globals={globals} renderGlobals={renderGlobals}>
+          <PrinterParse globals={globals} renderGlobals={renderGlobals} />
+        </LoginRequired>
       </div>
     )
   }

@@ -84,9 +84,11 @@ echo ''
 echo '--> fix file permissions'
 chown -R www-data:www-data /var/www/html
 
-rm -r /var/www/html/custom_apps
-ln -s /efs/custom_apps /var/www/html/custom_apps
-chown -R www-data:www-data /var/www/html/custom_apps
+# link custom_apps into efs (it's not working with config to that path -.-)
+# TODO: disabled as it breaks the update process LOL
+# rm -r /var/www/html/custom_apps
+# ln -s /efs/custom_apps /var/www/html/custom_apps
+# chown -R www-data:www-data /var/www/html/custom_apps
 
 # sudo -u www-data ../bootstrap.php
 

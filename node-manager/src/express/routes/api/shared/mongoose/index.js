@@ -3,6 +3,8 @@ import CsvData from '../../../../../shared/db/schema/csvData'
 const debug = false
 
 export const saveCsvData = (req, res, next) => {
+  console.log('wtf', req.decoded)
+  // TODO: all with role "user" or "admin" must have access, and if users, only if they have the module "printers"
   if (req.decoded.email !== 'admin@stackbee.io') {
     return res.status(403).send({
       success: false,

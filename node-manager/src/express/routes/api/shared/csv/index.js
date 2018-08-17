@@ -17,6 +17,7 @@ const userIsKnown = (user) => {
 };
 
 export default (req, res, next) => {
+  console.log('woot', req.decoded)
   if (req.decoded.email !== 'admin@stackbee.io') {
     return res.status(403).send({
       success: false,

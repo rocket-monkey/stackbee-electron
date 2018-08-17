@@ -6,10 +6,13 @@ const getConnectionUrl = (isDev) => {
 
 export default class StackbeeAPI {
   url = ''
-  token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQHN0YWNrYmVlLmlvIiwicm9sZXMiOlsiYWRtaW4iXSwiaWF0IjoxNDk3NjQ0MTgyfQ.vBpRonrwXE2EU96NUWJT0nA9eTCpBlyjn678fAgNOO8'
+  token = null
 
   constructor(isDev) {
     this.url = getConnectionUrl(isDev)
+
+    const auth = typeof localStorage !== 'undefined' && (JSON.parse(localStorage.getItem('auth')) || {}) || {}
+    this.token = auth && auth.token
   }
 
   post(endpoint, data) {
@@ -20,6 +23,9 @@ export default class StackbeeAPI {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
+    }).catch(error => {
+      console.error('🚨🚨 !!StackbeeAPI CRASHED!! 🚨🚨', error)
+      return {}
     })
   }
 }

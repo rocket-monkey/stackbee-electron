@@ -23,7 +23,12 @@ const withLifecycle = lifecycle({
 })
 
 const withRenderGlobals = withHandlers({
-  renderGlobals: ({ globals }) => () => Object.keys(globals).map(key => <span key={key}>{key}: {globals[key].toString()}&nbsp;</span>)
+  renderGlobals: ({ globals }) => () => Object.keys(globals).map(key => {
+    const value = JSON.stringify(globals[key])
+    return (
+      <span key={key}>{key}: {value}&nbsp;</span>
+    )
+  })
 })
 
 const withUpdateGlobals = withHandlers({
@@ -36,7 +41,7 @@ class Loading extends Component {
   componentDidMount () {
     // open dev-tools in production
     const { globalShortcut, BrowserWindow } = require('electron').remote
-    globalShortcut.register('CommandOrControl+Shift+K', () => {
+    globalShortcut.register('CommandOrControl+Shift+Z', () => {
       BrowserWindow.getFocusedWindow().webContents.openDevTools()
     })
 

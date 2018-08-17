@@ -10,6 +10,7 @@
     "mail_smtpport": 587,
     "mail_smtpsecure": "tls",
     "mail_domain": "stackbee.cloud",
-    "mail_from_address": "info"
+    "mail_from_address": "info",
+    "integrity.check.disabled": true
   }
 }
