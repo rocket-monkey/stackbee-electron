@@ -11,6 +11,7 @@ const resolverOptions = {
     "@sites": "./src/@sites",
     "@lang": "./src/@lang",
     "@helpers": "./src/@helpers",
+    "@icons": "./src/@icons",
     "@printers": "./src/@printers"
   }
 }

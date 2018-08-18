@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { Component, Fragment } from 'react'
 import { FormattedMessage } from 'react-intl'
-import { DbConnectionRequired } from '@core/alert'
+import Button from '@core/button'
 import { analyzeFile, parseData } from './parser'
 
 export default class PrintersParse extends Component {
@@ -73,13 +73,12 @@ export default class PrintersParse extends Component {
     ))
     return (
       <Fragment>
-        {/*
-        <DbConnectionRequired {...globals} />
-        */}
-
-        <button onClick={this.openFile} disabled={isWorking}>
+        <h3>
+          <FormattedMessage id='@printers.parse.index.title' defaultMessage='Printer CSV Parsing' />
+        </h3>
+        <Button primary onClick={this.openFile} disabled={isWorking}>
           <FormattedMessage id='@printers.parse.index.open' defaultMessage='Open File' />
-        </button>
+        </Button>
 
         <ul>
           {filesArr.map((file, index) => {
@@ -99,15 +98,15 @@ export default class PrintersParse extends Component {
                     <FormattedMessage id='@printers.parse.index.processedInfo' defaultMessage='Processed' />: {meta.processed}
                   </span>
                 }
-                <button
-                  className="inlineButton"
+                <Button
+                  floatRight
                   onClick={() => {
                     this.parseFile(name)
                   }}
                   disabled={!meta.valid || isWorking || alreadyParsed}
                 >
                   <FormattedMessage id='@printers.parse.index.parse' defaultMessage='Parse File' />
-                </button>
+                </Button>
               </li>
             )
           })}
@@ -127,15 +126,14 @@ export default class PrintersParse extends Component {
             background: rgba(0, 0, 0, .25);
             padding: 6px;
             border-radius: 5px;
-            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            font-size: 13px;
+            margin-bottom: 4px;
+            line-height: 1.2rem;
           }
 
           .loading {
             opacity: .5;
-          }
-
-          .inlineButton {
-            float: right;
           }
 
           .processed {

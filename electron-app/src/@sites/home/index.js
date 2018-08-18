@@ -7,7 +7,6 @@ export default class Home extends Component {
     const { globals, renderGlobals, appState } = this.props
     return (
       <div>
-        <h2>Home</h2>
         <LoginRequired appState={appState}>
           <PrinterParse globals={globals} renderGlobals={renderGlobals} />
         </LoginRequired>

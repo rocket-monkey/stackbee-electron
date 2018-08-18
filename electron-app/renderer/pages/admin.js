@@ -1,9 +1,8 @@
 import Layout, { appState } from '@core/layout'
-import Link from 'next/link'
-import Home from '@sites/home'
+import Admin from '@sites/admin'
 
 export default () => (
   <Layout appState={appState} isAdminRoute>
-    <div>wuat</div>
+    <Admin />
   </Layout>
 )

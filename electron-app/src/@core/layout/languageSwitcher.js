@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import Button from '@core/button'
 
 const LanguageSwitcher = ({ languages, currentLang, updateGlobals }) => {
   const langs = languages.concat('en')
@@ -9,7 +10,7 @@ const LanguageSwitcher = ({ languages, currentLang, updateGlobals }) => {
         const isLast = index === langs.length - 1
         return (
           <Fragment key={`lang-swticher-${lang}`}>
-            <button disabled={isActive} onClick={() => updateGlobals({ locale: lang }) }>{lang}</button>
+            <Button disabled={isActive} onClick={() => updateGlobals({ locale: lang }) }>{lang}</Button>
             {
               !isLast &&
               ' | '

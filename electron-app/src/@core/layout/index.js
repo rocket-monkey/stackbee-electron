@@ -5,10 +5,11 @@ import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import DragArea from './dragArea'
 import AdminLink from './adminLink'
+import Logout from './logout'
 import Content from './content'
 
 export const appState = observable({
-  auth: 0
+  auth: {}
 })
 export default observer(
 class Layout extends Component {
@@ -24,6 +25,7 @@ class Layout extends Component {
 
     return (
       <div>
+        {decodedJwt && <Logout appState={appState} />}
         {isAdmin && <AdminLink isAdminRoute={isAdminRoute} />}
         <DragArea />
         <Content children={mappedChildren} />
@@ -33,11 +35,21 @@ class Layout extends Component {
           :global(body) {
             height: calc(100vh - 16px);
           }
-          :global(body > div) {
+          :global(#__next),
+          :global(#__next-error) {
             height: calc(100vh - 16px);
+          }
+          :global(#__next-error) {
+            position: absolute;
+            top: 24px;
+            z-index: -1;
           }
           :global(body *) {
             box-sizing: border-box;
+          }
+          :global(a) {
+            color: white;
+            text-decoration: none;
           }
 
           div {
