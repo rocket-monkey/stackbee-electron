@@ -30,7 +30,7 @@ export default class PrintersParse extends Component {
     try {
       this.setState({ isWorking: fileName })
       const { files } = this.state
-      const result = await parseData(fileName, fs.readFileSync(fileName, 'utf-8'))
+      const result = await parseData(fileName, fs.readFileSync(fileName, 'utf-8'), this.props.appState)
       if (result.success) {
         files[fileName].meta.processed = result.processed
         this.setState({ isWorking: false, files })

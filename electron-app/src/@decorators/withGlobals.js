@@ -1,4 +1,3 @@
-import { Component, Fragment } from 'react'
 import {
   compose,
   lifecycle,
@@ -7,6 +6,7 @@ import {
   branch,
   renderComponent
 } from 'recompose'
+import Loading from '@core/loading'
 
 const withGlobalsState = withState('globals', 'setGlobals', {})
 
@@ -37,27 +37,6 @@ const withUpdateGlobals = withHandlers({
     ...update
   })
 })
-class Loading extends Component {
-  componentDidMount () {
-    // open dev-tools in production
-    const { globalShortcut, BrowserWindow } = require('electron').remote
-    globalShortcut.register('CommandOrControl+Shift+Z', () => {
-      BrowserWindow.getFocusedWindow().webContents.openDevTools()
-    })
-
-    window.addEventListener('beforeunload', () => {
-      globalShortcut.unregisterAll()
-    })
-  }
-
-  render () {
-    return (
-      <Fragment>
-        <h2>loading...</h2>
-      </Fragment>
-    )
-  }
-}
 
 const onlyRenderWhenGlobalsAreSet = branch(
   ({ globals }) => Object.keys(globals).length === 0 || !globals.locale,

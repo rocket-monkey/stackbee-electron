@@ -8,11 +8,11 @@ export default class StackbeeAPI {
   url = ''
   token = null
 
-  constructor(isDev) {
+  constructor(isDev, appSate) {
     this.url = getConnectionUrl(isDev)
+    this.post = this.post.bind(this)
 
-    const auth = typeof localStorage !== 'undefined' && (JSON.parse(localStorage.getItem('auth')) || {}) || {}
-    this.token = auth && auth.token
+    this.token = appSate.auth && appSate.auth.token
   }
 
   post(endpoint, data) {

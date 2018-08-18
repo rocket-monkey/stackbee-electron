@@ -8,7 +8,7 @@ import { getConfigByFieldDefs, detectNewLine, processLine, transformNewEntry } f
 const debug = true
 
 const isDev = require('electron-is-dev')
-const api = new StackbeeAPI(isDev)
+let api = null
 
 const CSV_CONFIG_DEFAULT = {
   delimiter: ',',
@@ -16,7 +16,11 @@ const CSV_CONFIG_DEFAULT = {
   relax_column_count: true
 }
 
-const process = async (parsed) => {
+const process = async (parsed, appState) => {
+  if (!api) {
+    api = new StackbeeAPI(isDev, appState)
+  }
+
   return new Promise((resolve, reject) => {
     const fieldDefs = parsed.shift()
     isDev && console.info('fieldDefs:', fieldDefs.length, fieldDefs)
@@ -63,7 +67,7 @@ export const analyzeFile = (fileName, data) => {
   return { valid }
 }
 
-export const parseData = (fileName, data) => {
+export const parseData = (fileName, data, appState) => {
   return new Promise((resolve, reject) => {
     if (data.includes('<html>')) { // html file content detected!
       const csvData = tableToCsv(data)
@@ -73,7 +77,7 @@ export const parseData = (fileName, data) => {
 
         debug && console.info('Parser: parsed file content:', parsed)
 
-        const result = await process(parsed)
+        const result = await process(parsed, appState)
         resolve(result)
       })
     } else {

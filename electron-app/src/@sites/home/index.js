@@ -8,7 +8,7 @@ export default class Home extends Component {
     return (
       <div>
         <LoginRequired appState={appState}>
-          <PrinterParse globals={globals} renderGlobals={renderGlobals} />
+          <PrinterParse appState={appState} globals={globals} renderGlobals={renderGlobals} />
         </LoginRequired>
       </div>
     )

@@ -5,16 +5,18 @@ import { FormattedMessage } from 'react-intl'
 import classNames from 'class-names'
 import NoSSR from 'react-no-ssr'
 import Button from '@core/button'
+import Loading from '@core/loading'
 import Input from '@core/form/input'
 import Logo from '@core/logo'
 import StackbeeAPI from '@api'
 
 const isDev = require('electron-is-dev')
-const api = new StackbeeAPI(isDev)
+let api = null
 
 export default observer(
 class LoginRequired extends Component {
   state = {
+    visible: false,
     error: false,
     success: false
   }
@@ -76,14 +78,19 @@ class LoginRequired extends Component {
     const auth = typeof localStorage !== 'undefined' && (JSON.parse(localStorage.getItem('auth')) || {}) || {}
     setTimeout(action(() => {
       this.props.appState.auth = auth
+      api = new StackbeeAPI(isDev, this.props.appState)
+      this.setState({ visible: true })
     }), 50)
-
   }
 
   render() {
     const { children, appState } = this.props
-    const { error, success } = this.state
+    const { visible, error, success } = this.state
     const isLoggedIn = Object.keys(appState.auth).length > 0
+
+    if (!visible) {
+      return <Loading />
+    }
 
     if (!isLoggedIn) {
       return (
