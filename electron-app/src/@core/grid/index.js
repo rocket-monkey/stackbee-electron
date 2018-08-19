@@ -188,6 +188,77 @@ class InfoPane extends Component {
   }
 }
 
+class Sortable extends Component {
+  render() {
+    const { data, field, setSort, loading } = this.props
+    const { sort = {} } = data || {}
+
+    const isSorted = sort[field]
+
+    return (
+      <Fragment>
+        <div
+          className={classNames({ 'loading': loading, 'desc': isSorted === 'desc', 'asc': isSorted === 'asc', 'notYet': !isSorted })}
+          onClick={() => {
+            setSort({ [field]: !isSorted || isSorted === 'desc' ? 'asc' : 'desc' })
+          }}
+        >
+          {isSorted && isSorted === 'asc' && <i className="up" />}
+          {isSorted && isSorted === 'desc' && <i className="down" />}
+          {!isSorted && <i className="up disabled" />}
+        </div>
+
+        <style jsx>{`
+          div {
+            display: inline-block;
+            position: relative;
+            top: 2px;
+          }
+
+          .asc {
+            cursor: s-resize;
+          }
+
+          .notYet {
+            cursor: n-resize;
+          }
+
+          .desc {
+            cursor: n-resize;
+          }
+
+          .loading {
+            cursor: inherit;
+          }
+
+          i {
+            border: solid ${colors.yellow};
+            border-width: 0 2px 2px 0;
+            display: inline-block;
+            padding: 2px;
+            float: right;
+          }
+
+          .up {
+            transform: rotate(-135deg) translateY(-4px) translateX(2px);
+            position: relative;
+            left: 4px;
+          }
+
+          .down {
+            transform: rotate(45deg);
+            cursor: n-resize;
+          }
+
+          .disabled {
+            border-color: ${colors.whiteAlpha35};
+          }
+        `}</style>
+      </Fragment>
+    )
+  }
+}
+
 let lastKeyCode = null
 
 export default class Grid extends Component {
@@ -267,14 +338,19 @@ export default class Grid extends Component {
     const { page = 0, pages = 0 } = data || {}
 
     return (
-      <div>
+      <div className="table">
         <EditForm loading={loading} fields={fields} edit={this.state.edit} docs={data && data.docs} />
         <table className={classNames({ 'loading': loading, 'splitView': this.state.edit > -1 })}>
           <thead>
             <tr>
               <th className="tiny">#</th>
               {fields.map((field, index) => (
-                <th key={`head-${index}`} className={classNames(field.cls, { 'focusHead': field.focus })}>{field.head}</th>
+                <th key={`head-${index}`} className={classNames(field.cls, { 'focusHead': field.focus })}>
+                  <div className="flexContainer">
+                    <div>{field.head}</div>
+                    <Sortable setSort={this.props.setSort} field={field.name} data={data} loading={loading} />
+                  </div>
+                </th>
               ))}
             </tr>
           </thead>
@@ -318,10 +394,21 @@ export default class Grid extends Component {
         </table>
 
         <style jsx>{`
-          div {
+          .table {
             position: relative;
             overflow: hidden;
             padding-bottom: 38px;
+          }
+
+          .flexContainer {
+            display: flex;
+          }
+
+          .flexContainer > :global(div:first-child) {
+            flex: 0 1 auto;
+          }
+          .flexContainer > :global(div) {
+            flex: 0 1 90%;
           }
 
           table {

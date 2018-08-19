@@ -34,6 +34,7 @@ class PrintersReport extends Component {
             data={data}
             perPage={PER_PAGE}
             setPage={this.props.setPage}
+            setSort={this.props.setSort}
             loading={loading}
           />
         }
@@ -50,8 +51,11 @@ class PrintersReport extends Component {
   }
 }
 
-export default WithFetch((props) => (
-  {
-    endpoint: `/csvdata?page=${props.page}&perPage=${PER_PAGE}`
-  }
-))(PrintersReport)
+export default WithFetch(({ page, sort }) => {
+  const sortStr = sort && JSON.stringify(sort) || 'null'
+  return (
+    {
+      endpoint: `/csvdata?page=${page}&perPage=${PER_PAGE}&sort=${sortStr}`
+    }
+  )
+})(PrintersReport)

@@ -11,6 +11,7 @@ let fetchRunning = null
 
 const withDataState = withState('data', 'setData', null)
 const withPageState = withState('page', 'setPage', 0)
+const withSortState = withState('sort', 'setSort', null)
 const withLoadingState = withState('loading', 'setLoading', false)
 const withErrorState = withState('error', 'setError', null)
 
@@ -57,7 +58,17 @@ const withFetchHOC = config => Component => props => {
     api = new StackbeeAPI(isDev, props.appState)
   }
 
-  const pageChanged = (api && props.data && props.data.page !== props.page)
+  const existingSort = JSON.stringify(props.data && props.data.sort) || ''
+  const sort = JSON.stringify(props && props.sort) || ''
+
+  const pageChanged = (
+    api &&
+    props.data &&
+    (
+      props.data.page !== props.page ||
+      existingSort !== sort
+    )
+  )
   if ((api && !props.data && !props.error && !fetchRunning) || (api && !fetchRunning && pageChanged)) {
     fetch()
   }
@@ -72,6 +83,7 @@ const withFetchHOC = config => Component => props => {
 export default config => WithFetch => compose(
   withDataState,
   withPageState,
+  withSortState,
   withLoadingState,
   withErrorState,
   withFetchHOC(config)
