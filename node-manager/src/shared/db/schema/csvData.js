@@ -1,10 +1,12 @@
 import mongoose from 'mongoose';
+const ObjectId = mongoose.Schema.Types.ObjectId
 
 const Schema = mongoose.Schema;
 
 // create a schema
 const csvDataSchema = new Schema({
   hash                : { type: String, required: true, unique: true },
+  userRef             : { type: ObjectId, required: true },
   accountingId        : { type: String },
   taskType            : { type: String },
   documentName        : { type: String, required: true },

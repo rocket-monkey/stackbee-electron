@@ -28,7 +28,7 @@ export default class StackbeeAPI {
   }
 
   get(endpoint) {
-    return fetch(`${this.url}${endpoint}?token=${this.token}`, {
+    return fetch(`${this.url}${endpoint}${endpoint.includes('?') ? '&' : '?'}token=${this.token}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -41,7 +41,7 @@ export default class StackbeeAPI {
   }
 
   post(endpoint, data) {
-    return fetch(`${this.url}${endpoint}?token=${this.token}`, {
+    return fetch(`${this.url}${endpoint}${endpoint.includes('?') ? '&' : '?'}token=${this.token}`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

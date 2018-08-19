@@ -26,8 +26,8 @@ export const LogoSmall = ({ sticker }) => (
       }
       .sticker {
         position: absolute;
-        bottom: 28px;
-        right: ${spacings.small};
+        bottom: 29px;
+        right: 0;
         overflow: hidden;
         cursor: pointer;
       }

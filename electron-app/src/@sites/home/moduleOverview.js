@@ -1,5 +1,4 @@
 import { Component, Fragment } from 'react'
-import { compose } from 'recompose'
 import { FormattedMessage } from 'react-intl'
 import Link from 'next/link'
 import jwtDecode from 'jwt-decode'
@@ -41,13 +40,11 @@ class ModuleOverview extends Component {
   render() {
     const { loading, error, data } = this.props
 
-    if (loading || error) {
+    if (loading && !error) {
       return null
     }
 
-    if (!data || !data.modules) {
-      return <Alert type="error"><FormattedMessage id='@app.error' defaultMessage='Error ocurred!' /></Alert>
-    }
+    const hasError = !data || !data.modules || error
 
     return (
       <div>
@@ -56,7 +53,7 @@ class ModuleOverview extends Component {
           <LogoSmall />
         </h2>
 
-        <div className="container">
+        {!hasError && <div className="container">
           {data.modules.map((module, index) => (
             <div className="module" key={`module-${index}`}>
               <Link href={`/module?module=${module}`}>
@@ -67,7 +64,9 @@ class ModuleOverview extends Component {
               </Link>
             </div>
           ))}
-        </div>
+        </div>}
+
+        {hasError && <Alert type="error"><FormattedMessage id='@app.error' defaultMessage='Error ocurred!' /></Alert>}
 
         <style jsx>{`
           h2 {
@@ -118,8 +117,6 @@ class ModuleOverview extends Component {
   }
 }
 
-export default compose(
-  WithFetch({
-    endpoint: '/modules'
-  })
-)(ModuleOverview)
+export default WithFetch({
+  endpoint: '/modules'
+})(ModuleOverview)

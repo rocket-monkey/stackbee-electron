@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import classNames from 'class-names'
 import { colors, spacings, fontSizes } from '@styles'
 
 export default class Input extends Component {
@@ -8,10 +9,15 @@ export default class Input extends Component {
 
     this.inputRef = React.createRef()
     this.getValue = this.getValue.bind(this)
+    this.setValue = this.setValue.bind(this)
   }
 
   getValue() {
     return this.inputRef.current.value
+  }
+
+  setValue(value) {
+    this.inputRef.current.value = value
   }
 
   componentDidMount() {
@@ -22,11 +28,11 @@ export default class Input extends Component {
   }
 
   render() {
-    const { type = 'text', name = 'unset', placeholder, label, disabled } = this.props
+    const { type = 'text', name = 'unset', value, placeholder, label, disabled, inverted } = this.props
     return (
-      <div>
+      <div className={classNames({ 'inverted': inverted })}>
         {label && <label className="label">{label}</label>}
-        <input className="input" type={type} name={name} placeholder={placeholder} disabled={disabled} ref={this.inputRef} />
+        <input className="input" type={type} name={name} defaultValue={value} placeholder={placeholder} disabled={disabled} ref={this.inputRef} />
 
         <style jsx>{`
           div {
@@ -43,6 +49,10 @@ export default class Input extends Component {
             text-transform: uppercase;
           }
 
+          .inverted :global(.label) {
+            color: ${colors.dark};
+          }
+
           .input {
             border-radius: ${spacings.radiusTiny};
             margin-bottom: ${spacings.big};
@@ -54,6 +64,11 @@ export default class Input extends Component {
             outline: none;
             border: none;
             transition: all .5s ease;
+          }
+
+          .inverted :global(input) {
+            color: ${colors.dark};
+            background: ${colors.grayLightAlpha80};
           }
 
           .input:hover,

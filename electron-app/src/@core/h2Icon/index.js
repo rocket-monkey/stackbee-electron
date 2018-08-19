@@ -1,11 +1,12 @@
 import { Component } from 'react'
+import classNames from 'class-names'
 import { colors, spacings, fontSizes } from '@styles'
 
-export default class ModuleSite extends Component {
+export default class H2Icon extends Component {
   render() {
-    const { children } = this.props
+    const { children, small = false } = this.props
     return (
-      <div>
+      <div className={classNames({ 'small': small })}>
         {children}
         <style jsx>{`
           div {
@@ -15,6 +16,17 @@ export default class ModuleSite extends Component {
             margin-left: ${spacings.small};
             height: 15px;
             top: -9px;
+          }
+
+          .small {
+            width: 23px;
+            margin-left: ${spacings.tiny};
+          }
+          .small :global(svg) {
+            transform-origin: center left;
+            transform: scale(.7);
+            margin: 0;
+            transition: all .5s ease;
           }
         `}</style>
       </div>

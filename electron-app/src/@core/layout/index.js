@@ -7,7 +7,6 @@ import DragArea from './dragArea'
 import AdminLink from './adminLink'
 import Logout from './logout'
 import Content from './content'
-import { LogoSmall } from '@core/logo'
 import { colors, spacings, fontSizes, zIndexes } from '@styles'
 
 export const appState = observable({
@@ -29,7 +28,6 @@ class Layout extends Component {
 
     return (
       <div>
-        <LogoSmall sticker />
         <Logout appState={appState} disabled={!decodedJwt} />
         {isAdmin && <AdminLink isAdminRoute={isAdminRoute} />}
         <DragArea />

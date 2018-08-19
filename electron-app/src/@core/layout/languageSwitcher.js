@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import { action } from 'mobx'
 import Button from '@core/button'
-import spacings from '@styles/spacings'
+import { spacings, zIndexes } from '@styles'
 
 const LanguageSwitcher = ({ appState }) => {
   const langs = appState.langs.concat('en')
@@ -26,11 +26,11 @@ const LanguageSwitcher = ({ appState }) => {
       <style jsx>{`
         div {
           position: absolute;
-          bottom: 0;
-          right: 0;
+          bottom: -2px;
+          right: -2px;
           width: 80px;
-          height: ${spacings.huge};
           text-align: center;
+          z-index: ${zIndexes.high}
         }
       `}</style>
     </div>

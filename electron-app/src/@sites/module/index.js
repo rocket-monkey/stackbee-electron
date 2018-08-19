@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import Alert from '@core/alert'
-import PrinterParse from '@printers/parse'
+import Printers from '@printers'
 import LoginRequired from '@core/loginRequired'
 
 class Module extends Component {
@@ -10,7 +10,7 @@ class Module extends Component {
       default:
         return <Alert type="warning">{`NO MODULE DEFINED FOR: ${module}`}</Alert>
       case 'printers':
-        return <PrinterParse appState={appState} />
+        return <Printers appState={appState} />
     }
   }
 }

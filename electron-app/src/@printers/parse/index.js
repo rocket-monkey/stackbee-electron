@@ -1,12 +1,15 @@
 import fs from 'fs'
 import { Component, Fragment } from 'react'
 import { FormattedMessage } from 'react-intl'
+import classNames from 'class-names'
 import IconBookBookmarkLiteratureReadSchool from '@icons/IconBookBookmarkLiteratureReadSchool'
 import H2Icon from '@core/h2Icon'
 import { parse } from 'path';
 import Button from '@core/button'
 import { analyzeFile, parseData } from './parser'
 import { colors, spacings, fontSizes } from '@styles'
+
+const isDev = require('electron-is-dev')
 
 export default class PrintersParse extends Component {
   state = {
@@ -20,7 +23,7 @@ export default class PrintersParse extends Component {
       const extension = parts.pop()
       if (extension === 'xls' || extension === 'html') {
         const meta = JSON.parse(localStorage.getItem(fileName)) || analyzeFile(fileName, fs.readFileSync(fileName, 'utf-8'))
-        console.info('fileName', fileName)
+        isDev && console.info('fileName', fileName)
         const { files } = this.state
         files[fileName] = {
           name: fileName,
@@ -42,7 +45,7 @@ export default class PrintersParse extends Component {
         files[fileName].meta.processed = processed
         files[fileName].meta.failedEntries = result.failedEntries
         this.setState({ isWorking: false, files })
-        localStorage.setItem(fileName, JSON.stringify(files[fileName].meta))
+        // localStorage.setItem(fileName, JSON.stringify(files[fileName].meta))
       } else {
         files[fileName].meta.error = true
         this.setState({ isWorking: false, files })
@@ -78,20 +81,27 @@ export default class PrintersParse extends Component {
     const filesArr = Object.keys(files).map(key => (
       files[key]
     ))
+
+    for (let i = 0, len = 3; i < len; i++) {
+      if (!filesArr[i]) {
+        filesArr.push({ skeleton: true })
+      }
+    }
+
     return (
       <Fragment>
         <h2>
-          <FormattedMessage id='@app.modules.printers' defaultMessage='Printer Mgmt' />
+          <FormattedMessage id='@app.modules.printers.parse' defaultMessage='Parse printer CSV' />
           <H2Icon><IconBookBookmarkLiteratureReadSchool /></H2Icon>
         </h2>
+
         <Button primary onClick={this.openFile} disabled={isWorking}>
           <FormattedMessage id='@printers.parse.index.open' defaultMessage='Open File' />
         </Button>
 
         <ul>
           {filesArr.map((file, index) => {
-            const { name, meta } = file
-            console.log('isWorking', isWorking)
+            const { name = '', meta = {} } = file
             const isWorkingThatFile = isWorking === file.name
             const alreadyParsed = typeof meta.processed !== 'undefined'
             const hasProcessed = !isWorkingThatFile && alreadyParsed && meta.processed > 0
@@ -102,7 +112,7 @@ export default class PrintersParse extends Component {
             }
 
             return (
-              <li key={index} className={isWorking === name ? 'loading' : ''}>
+              <li key={index} className={classNames({ 'loading': isWorkingThatFile, 'skeleton': file.skeleton })}>
                 <span className="name">{parts.pop()}</span>
                 {
                   hasProcessed &&
@@ -122,7 +132,7 @@ export default class PrintersParse extends Component {
                     <FormattedMessage id='@printers.parse.index.errorInfo' defaultMessage='Error' />
                   </span>
                 }
-                <Button
+                {!file.skeleton && <Button
                   floatRight
                   onClick={() => {
                     this.parseFile(name)
@@ -131,7 +141,7 @@ export default class PrintersParse extends Component {
                 >
                   {meta.valid && <FormattedMessage id='@printers.parse.index.parse' defaultMessage='Parse File' />}
                   {!meta.valid && <FormattedMessage id='@printers.parse.index.invalid' defaultMessage='Invalid' />}
-                </Button>
+                </Button>}
               </li>
             )
           })}
@@ -153,6 +163,11 @@ export default class PrintersParse extends Component {
             font-size: ${fontSizes.base};
             margin-bottom: 4px;
             line-height: 1.2rem;
+          }
+
+          .skeleton {
+            opacity: .25;
+            height: 34px;
           }
 
           .loading {
