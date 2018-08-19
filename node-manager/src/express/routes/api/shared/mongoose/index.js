@@ -1,10 +1,27 @@
 import CsvData from '../../../../../shared/db/schema/csvData'
+import { resolve } from 'path';
 import User from '../../../../../shared/db/schema/user'
 
 const debug = false
 
-export const saveCsvData = (req, res, next) => {
-  console.log('wtf', req.decoded)
+const saveEntry = (entry) => {
+  return new Promise((resolve, reject) => {
+    entry.save((err, csvData) => {
+      if (err) {
+        if (err['name'] === 'ValidationError') {
+          debug && console.error('Shit not working', err['errors'])
+          return resolve({ error: entry.hash })
+        }
+        return resolve({ exists: true })
+      }
+      return resolve({ success: true })
+    })
+  })
+}
+
+export const saveCsvData = async (req, res, next) => {
+  debug && console.log('decoded', req.decoded)
+
   // TODO: all with role "user" or "admin" must have access, and if users, only if they have the module "printers"
   if (req.decoded.email !== 'admin@stackbee.io') {
     return res.status(403).send({
@@ -15,29 +32,34 @@ export const saveCsvData = (req, res, next) => {
 
   let saved = 0
   let exists = 0
-  req.body.forEach(async (data, index) => {
+  const failedEntries = []
+  for (let i = 0, len = req.body.length; i < len; i++) {
+    const data = req.body[i]
+
     const entry = new CsvData(data)
 
-    CsvData
-      .find({ hash: entry.hash })
-      .exec((err, docs) => {
-        if (err) throw err
+    const result = await saveEntry(entry)
+    if (result.error) {
+      failedEntries.push(result.error)
+    }
 
-        if (docs.length > 0) {
-          debug && console.log('Entry already exists!', entry.hash)
-        } else {
-          entry.save((err, csvData) => {
-            if (err) throw err
-          })
-        }
-      })
+    if (result.exists) {
+      exists++
+    }
 
-    if (index === req.body.length - 1) {
+    if (result.success) {
+      saved++
+    }
+
+    if (i === req.body.length - 1) {
       res.json({
-        received: req.body.length
+        received: req.body.length,
+        exists,
+        saved,
+        failedEntries
       })
     }
-  })
+  }
 }
 
 const getUserByEmail = (email) => {

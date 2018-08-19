@@ -52,7 +52,7 @@ export default class Button extends Component {
             color: ${colors.whiteAlpha15};
             border: 1px solid ${colors.grayAlpha40};
             background: ${colors.grayAlpha20};
-            cursor: not-allowed;
+            cursor: inherit;
           }
 
           button:hover,

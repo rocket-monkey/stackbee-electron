@@ -31,7 +31,6 @@ const process = async (parsed, appState) => {
       return reject('No csv config found for file!')
     }
 
-
     let entries = []
     let newEntry = {}
 
@@ -52,8 +51,8 @@ const process = async (parsed, appState) => {
 
     api
       .post('/csvdata', entries)
-      .then(res => res.json && res.json() || res)
-      .then(json => resolve({ processed: entries.length, success: json.received === entries.length }))
+      .then(res => res.json && res.json() || {})
+      .then(json => resolve(json))
   })
 }
 

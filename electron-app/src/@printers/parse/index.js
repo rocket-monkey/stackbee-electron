@@ -3,6 +3,7 @@ import { Component, Fragment } from 'react'
 import { FormattedMessage } from 'react-intl'
 import IconBookBookmarkLiteratureReadSchool from '@icons/IconBookBookmarkLiteratureReadSchool'
 import H2Icon from '@core/h2Icon'
+import { parse } from 'path';
 import Button from '@core/button'
 import { analyzeFile, parseData } from './parser'
 import { colors, spacings, fontSizes } from '@styles'
@@ -18,7 +19,8 @@ export default class PrintersParse extends Component {
       const parts = fileName.split('.')
       const extension = parts.pop()
       if (extension === 'xls' || extension === 'html') {
-        const meta = analyzeFile(fileName, fs.readFileSync(fileName, 'utf-8'))
+        const meta = JSON.parse(localStorage.getItem(fileName)) || analyzeFile(fileName, fs.readFileSync(fileName, 'utf-8'))
+        console.info('fileName', fileName)
         const { files } = this.state
         files[fileName] = {
           name: fileName,
@@ -31,14 +33,19 @@ export default class PrintersParse extends Component {
 
   async parseFile (fileName) {
     try {
-      this.setState({ isWorking: fileName })
       const { files } = this.state
+      files[fileName].meta.error = false
+      this.setState({ isWorking: fileName, files })
       const result = await parseData(fileName, fs.readFileSync(fileName, 'utf-8'), this.props.appState)
-      if (result.success) {
-        files[fileName].meta.processed = result.processed
+      const processed = (result.received && result.received) - (result.failedEntries && result.failedEntries.length)
+      if (processed === (result.exists + result.saved)) {
+        files[fileName].meta.processed = processed
+        files[fileName].meta.failedEntries = result.failedEntries
         this.setState({ isWorking: false, files })
+        localStorage.setItem(fileName, JSON.stringify(files[fileName].meta))
       } else {
-        this.setState({ isWorking: false })
+        files[fileName].meta.error = true
+        this.setState({ isWorking: false, files })
       }
     } catch (err) {
       console.error('Error ocurred!', err)
@@ -60,9 +67,7 @@ export default class PrintersParse extends Component {
     }, fileNames => {
       if (fileNames === undefined) return
 
-      this.setState({ isWorking: true })
       this.tryToParseFiles(fileNames)
-      this.setState({ isWorking: false })
     })
   }
 
@@ -86,7 +91,11 @@ export default class PrintersParse extends Component {
         <ul>
           {filesArr.map((file, index) => {
             const { name, meta } = file
+            console.log('isWorking', isWorking)
+            const isWorkingThatFile = isWorking === file.name
             const alreadyParsed = typeof meta.processed !== 'undefined'
+            const hasProcessed = !isWorkingThatFile && alreadyParsed && meta.processed > 0
+            const hasFailed = !isWorkingThatFile && typeof meta.failedEntries !== 'undefined' && meta.failedEntries.length > 0
             let parts = name.split('/')
             if (parts.length === 1) {
               parts = name.split('\\')
@@ -96,9 +105,21 @@ export default class PrintersParse extends Component {
               <li key={index} className={isWorking === name ? 'loading' : ''}>
                 <span className="name">{parts.pop()}</span>
                 {
-                  meta.processed &&
+                  hasProcessed &&
                   <span className="processed">
                     <FormattedMessage id='@printers.parse.index.processedInfo' defaultMessage='Processed' />: {meta.processed}
+                  </span>
+                }
+                {
+                  hasFailed &&
+                  <span className="failed">
+                    <FormattedMessage id='@printers.parse.index.failedInfo' defaultMessage='Invalid' />: {meta.failedEntries.length}
+                  </span>
+                }
+                {
+                  meta.error &&
+                  <span className="error">
+                    <FormattedMessage id='@printers.parse.index.errorInfo' defaultMessage='Error' />
                   </span>
                 }
                 <Button
@@ -106,9 +127,10 @@ export default class PrintersParse extends Component {
                   onClick={() => {
                     this.parseFile(name)
                   }}
-                  disabled={!meta.valid || isWorking || alreadyParsed}
+                  disabled={!meta.valid || isWorking || (alreadyParsed && meta.failedEntries.length === 0)}
                 >
-                  <FormattedMessage id='@printers.parse.index.parse' defaultMessage='Parse File' />
+                  {meta.valid && <FormattedMessage id='@printers.parse.index.parse' defaultMessage='Parse File' />}
+                  {!meta.valid && <FormattedMessage id='@printers.parse.index.invalid' defaultMessage='Invalid' />}
                 </Button>
               </li>
             )
@@ -128,18 +150,35 @@ export default class PrintersParse extends Component {
             padding: ${spacings.small};
             border-radius: ${spacings.radiusSmall};
             border: 1px solid ${colors.whiteAlpha15};
-            font-size: ${fontSizes.medium};
+            font-size: ${fontSizes.base};
             margin-bottom: 4px;
             line-height: 1.2rem;
           }
 
           .loading {
             opacity: .5;
+            cursor: progress;
           }
 
+          .error,
+          .failed,
           .processed {
+            color: ${colors.bright};
+            background: ${colors.blue};
+            padding: ${spacings.tiny} ${spacings.small};
+            border-radius: ${spacings.radiusTiny};
             margin-left: ${spacings.medium};
-            font-size: ${fontSizes.small};
+            font-size: ${fontSizes.tiny};
+            text-transform: uppercase;
+            font-style: italic;
+          }
+
+          .error {
+            color: ${colors.red}
+          }
+
+          .failed {
+            color: ${colors.yellow}
           }
         `}</style>
       </Fragment>
