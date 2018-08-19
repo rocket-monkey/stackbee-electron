@@ -9,6 +9,7 @@ import Loading from '@core/loading'
 import Input from '@core/form/input'
 import Logo from '@core/logo'
 import StackbeeAPI from '@api'
+import { colors, spacings, fontSizes } from '@styles'
 
 const isDev = require('electron-is-dev')
 let api = null
@@ -97,7 +98,9 @@ class LoginRequired extends Component {
         <NoSSR>
           <Logo />
 
-          <h2>Login</h2>
+          <h2>
+            <FormattedMessage id='@app.login.submit' defaultMessage='Login' />
+          </h2>
 
           <form onSubmit={this.handleSubmit.bind(this)}>
             <Input type="text" name="username" autoFocus label={<FormattedMessage id='@app.login.username' defaultMessage='Username' />} ref={this.usernameRef} disabled={success} />
@@ -117,18 +120,6 @@ class LoginRequired extends Component {
           </form>
 
           <style jsx>{`
-            h2 {
-              width: 50%;
-              max-width: 500px;
-              min-width: 300px;
-              margin: 0 auto 18px auto;
-              padding: 6px;
-              border-radius: 5px;
-              background: rgba(0, 0, 0, .25);
-              text-align: center;
-              text-transform: lowercase;
-            }
-
             form {
               width: 50%;
               max-width: 500px;
@@ -147,23 +138,23 @@ class LoginRequired extends Component {
               position: absolute;
               bottom: 0;
               left: 0;
-              color: rgba(255, 255, 255, .7);
+              color: ${colors.bright};
               opacity: 0;
               pointer-events: none;
-              border-radius: 3px;
-              padding: 6px 9px;
-              border: 1px solid rgba(255, 255, 255, .15);
-              box-shadow: inset rgba(255, 25, 251, .9) 0 0 3px;
+              border-radius: ${spacings.radiusTiny};
+              padding: ${spacings.small} ${spacings.base};
+              border: 1px solid ${colors.whiteAlpha15};
+              box-shadow: inset ${colors.purple} 0 0 ${spacings.tiny};
               text-transform: uppercase;
-              font-size: .75rem;
-              background: rgba(255, 94, 86, .5);
+              font-size: ${fontSizes.small};
+              background: ${colors.redDark};
               transition: opacity .3s ease, transform .5s ease;
               transform: translateY(50%) rotateZ(6deg);
             }
 
             .successPane {
-              box-shadow: inset rgba(201, 255, 83, .9) 0 0 3px;
-              background: rgba(44, 167, 43, .5);
+              box-shadow: inset ${colors.mintGreen} 0 0 3px;
+              background: ${colors.green};
             }
 
             .paneActive {

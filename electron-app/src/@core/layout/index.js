@@ -7,8 +7,12 @@ import DragArea from './dragArea'
 import AdminLink from './adminLink'
 import Logout from './logout'
 import Content from './content'
+import { LogoSmall } from '@core/logo'
+import { colors, spacings, fontSizes, zIndexes } from '@styles'
 
 export const appState = observable({
+  locale: 'en',
+  langs: null,
   auth: {}
 })
 export default observer(
@@ -25,10 +29,11 @@ class Layout extends Component {
 
     return (
       <div>
-        {decodedJwt && <Logout appState={appState} />}
+        <LogoSmall sticker />
+        <Logout appState={appState} disabled={!decodedJwt} />
         {isAdmin && <AdminLink isAdminRoute={isAdminRoute} />}
         <DragArea />
-        <Content children={mappedChildren} />
+        <Content appState={appState} children={mappedChildren} />
 
         <style jsx>{`
           :global(html),
@@ -42,7 +47,7 @@ class Layout extends Component {
           :global(#__next-error) {
             position: absolute;
             top: 24px;
-            z-index: -1;
+            z-index: ${zIndexes.below};
           }
           :global(body *) {
             box-sizing: border-box;
@@ -51,12 +56,26 @@ class Layout extends Component {
             color: white;
             text-decoration: none;
           }
+          :global(h2) {
+            width: 50%;
+            max-width: 500px;
+            min-width: 300px;
+            margin: 0 auto ${spacings.big} auto;
+            padding: ${spacings.small};
+            border-radius: ${spacings.radiusSmall};
+            background: ${colors.blackAlpha25};
+            text-align: center;
+            text-transform: lowercase;
+            font-size: ${fontSizes.medium};
+            position: relative;
+            top: -10px;
+          }
 
           div {
             height: 100%;
-            padding: 18px 12px;
+            padding: ${spacings.big} ${spacings.medium};
             position: relative;
-            color: #ddd;
+            color: ${colors.content};
             font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
           }
         `}</style>

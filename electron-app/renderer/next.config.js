@@ -12,7 +12,8 @@ const resolverOptions = {
     "@lang": "./src/@lang",
     "@helpers": "./src/@helpers",
     "@icons": "./src/@icons",
-    "@printers": "./src/@printers"
+    "@printers": "./src/@printers",
+    "@styles": "./src/@styles"
   }
 }
 

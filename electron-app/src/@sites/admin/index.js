@@ -1,12 +1,18 @@
 import { Component } from 'react'
+import LoginRequired from '@core/loginRequired'
+import H2Icon from '@core/h2Icon'
+import IconProtectRetrictionSecureUnlock from '@icons/IconProtectRetrictionSecureUnlock'
 
 export default class Admin extends Component {
   render() {
     const { globals, renderGlobals, appState } = this.props
     return (
-      <div>
-        <h2>Admin Area</h2>
-      </div>
+      <LoginRequired appState={appState}>
+        <h2>
+          Admin Area
+            <H2Icon><IconProtectRetrictionSecureUnlock /></H2Icon>
+        </h2>
+      </LoginRequired>
     )
   }
 }

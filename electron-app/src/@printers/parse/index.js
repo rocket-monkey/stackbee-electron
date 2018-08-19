@@ -1,8 +1,11 @@
 import fs from 'fs'
 import { Component, Fragment } from 'react'
 import { FormattedMessage } from 'react-intl'
+import IconBookBookmarkLiteratureReadSchool from '@icons/IconBookBookmarkLiteratureReadSchool'
+import H2Icon from '@core/h2Icon'
 import Button from '@core/button'
 import { analyzeFile, parseData } from './parser'
+import { colors, spacings, fontSizes } from '@styles'
 
 export default class PrintersParse extends Component {
   state = {
@@ -64,7 +67,6 @@ export default class PrintersParse extends Component {
   }
 
   render () {
-    const { globals, renderGlobals } = this.props
     const { isWorking, files } = this.state
     const hasNoFiles = files.length === 0
 
@@ -73,9 +75,10 @@ export default class PrintersParse extends Component {
     ))
     return (
       <Fragment>
-        <h3>
-          <FormattedMessage id='@printers.parse.index.title' defaultMessage='Printer CSV Parsing' />
-        </h3>
+        <h2>
+          <FormattedMessage id='@app.modules.printers' defaultMessage='Printer Mgmt' />
+          <H2Icon><IconBookBookmarkLiteratureReadSchool /></H2Icon>
+        </h2>
         <Button primary onClick={this.openFile} disabled={isWorking}>
           <FormattedMessage id='@printers.parse.index.open' defaultMessage='Open File' />
         </Button>
@@ -113,21 +116,19 @@ export default class PrintersParse extends Component {
           {hasNoFiles && <li><center><i><FormattedMessage id='@printers.parse.index.noFilesHint' defaultMessage='Please open printer files first to proceed' /></i></center></li>}
         </ul>
 
-        <figure>{renderGlobals()}</figure>
-
         <style jsx>{`
           ul {
-            margin: 9px 0;
+            margin: ${spacings.base} 0;
             padding: 0;
           }
 
           li {
             list-style: none;
-            background: rgba(0, 0, 0, .25);
-            padding: 6px;
-            border-radius: 5px;
-            border: 1px solid rgba(255, 255, 255, .1);
-            font-size: 13px;
+            background: ${colors.blackAlpha25};
+            padding: ${spacings.small};
+            border-radius: ${spacings.radiusSmall};
+            border: 1px solid ${colors.whiteAlpha15};
+            font-size: ${fontSizes.medium};
             margin-bottom: 4px;
             line-height: 1.2rem;
           }
@@ -137,16 +138,8 @@ export default class PrintersParse extends Component {
           }
 
           .processed {
-            margin-left: 12px;
-            font-size: 11px;
-          }
-
-          figure {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            margin: 0;
-            font-size: 8px;
+            margin-left: ${spacings.medium};
+            font-size: ${fontSizes.small};
           }
         `}</style>
       </Fragment>

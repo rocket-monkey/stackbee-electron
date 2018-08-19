@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import Link from 'next/link'
 import classNames from 'class-names'
+import { colors, spacings, fontSizes } from '@styles'
 
 export default class LinkButton extends Component {
 
@@ -32,13 +33,13 @@ export default class LinkButton extends Component {
         <style jsx>{`
           .link,
           .link > :global(a) {
-            color: rgba(255, 255, 255, .5);
+            color: ${colors.whiteAlpha50};
             text-transform: uppercase;
-            font-size: .65rem;
-            padding: 3px 6px;
-            border-radius: 3px;
-            background: rgba(33,33,33, .6);
-            border: 1px solid rgba(255, 255, 255, .1);
+            font-size: ${fontSizes.tiny};
+            padding: ${spacings.tiny} ${spacings.small};
+            border-radius: ${spacings.radiusTiny};
+            background: ${colors.grayAlpha60};
+            border: 1px solid ${colors.whiteAlpha15};
             outline: none;
             transition: all .5s ease;
             cursor: default;
@@ -48,14 +49,14 @@ export default class LinkButton extends Component {
           .link:focus,
           .link > :global(a:hover),
           .link > :global(a:focus) {
-            color: #333;
-            background: rgba(255,255,255, .6);
-            border: 1px solid rgba(255, 255, 255, .4);
+            color: ${colors.gray};
+            background: ${colors.whiteAlpha50};
+            border: 1px solid ${colors.whiteAlpha40};
           }
 
           .link:focus,
           .link > :global(a:focus) {
-            box-shadow: inset rgba(35, 128, 251, .9) 0 0 8px;
+            box-shadow: inset ${colors.focusShadow} 0 0 ${spacings.focusShadow};
           }
 
           .link > :global(svg) {
@@ -68,17 +69,17 @@ export default class LinkButton extends Component {
 
           .link:hover > :global(svg) > :global(g) > :global(path),
           .link:focus > :global(svg) > :global(g) > :global(path) {
-            fill: #333;
+            fill: ${colors.gray};
           }
 
           .iconOnly {
-            height: 32px;
+            height: ${spacings.grande};
             padding: 0;
           }
 
           .primary > :global(a) {
-            font-size: .75rem;
-            padding: 6px 9px;
+            font-size: ${fontSizes.small};
+            padding: ${spacings.small} ${spacings.base};
           }
 
           .floatRight > :global(a) {

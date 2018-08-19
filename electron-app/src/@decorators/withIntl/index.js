@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { action } from 'mobx'
 import { IntlProvider, addLocaleData, injectIntl } from 'react-intl'
 import messages from '@lang/messages.json'
 
@@ -29,15 +30,16 @@ export default (Page) => {
     }
 
     componentDidMount () {
-      this.props.updateGlobals({ languages: Object.keys(messages) })
+      action(() => {
+        this.props.appState.langs = Object.keys(messages)
+      })()
     }
 
     render () {
-      const { globals, now, ...props } = this.props
-      const { locale } = globals
+      const { appState, now, ...props } = this.props
       return (
-        <IntlProvider locale={locale} messages={messages[locale]} initialNow={now}>
-          <IntlPage globals={globals} {...props} />
+        <IntlProvider locale={appState.locale} messages={messages[appState.locale]} initialNow={now}>
+          <IntlPage appState={appState} {...props} />
         </IntlProvider>
       )
     }

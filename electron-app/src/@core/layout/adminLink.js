@@ -1,20 +1,20 @@
 import { Fragment } from 'react'
 import LinkButton from '@core/linkButton'
-import IconBuildingEstateHomeHouseReal from '@icons/IconBuildingEstateHomeHouseReal'
+import spacings from '@styles/spacings'
+import zIndexes from '@styles/zIndexes'
 import IconProtectRetrictionSecureUnlock from '@icons/IconProtectRetrictionSecureUnlock'
 
 const AdminLink = ({
   isAdminRoute
 }) => (
     <div className="linkContainer">
-      {isAdminRoute && <LinkButton href="/start" title="back to home"><IconBuildingEstateHomeHouseReal /></LinkButton>}
-      {!isAdminRoute && <LinkButton href="/admin" title="admin area"><IconProtectRetrictionSecureUnlock /></LinkButton>}
+      <LinkButton href="/admin" title="admin area"><IconProtectRetrictionSecureUnlock /></LinkButton>
     <style jsx>{`
       .linkContainer {
         position: absolute;
-        top: 6px;
+        top: ${spacings.small};
         right: 36px;
-        z-index: 100;
+        z-index: ${zIndexes.base};
       }
     `}</style>
   </div>

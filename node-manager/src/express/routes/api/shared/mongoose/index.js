@@ -1,4 +1,5 @@
 import CsvData from '../../../../../shared/db/schema/csvData'
+import User from '../../../../../shared/db/schema/user'
 
 const debug = false
 
@@ -36,5 +37,35 @@ export const saveCsvData = (req, res, next) => {
         received: req.body.length
       })
     }
+  })
+}
+
+const getUserByEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    User
+      .find({ email })
+      .limit(1)
+      .exec((error, users) => {
+        if (error || users.length === 0) {
+          console.error('API getUserByEmail: could not find user!')
+          return resolve(null)
+        }
+
+        resolve(users.pop())
+      })
+  })
+}
+
+export const getModules = async (req, res, next) => {
+  if (!req.decoded.email) {
+    return res.status(403).send({
+      success: false,
+      message: 'Only logged-in users can access this route!'
+    })
+  }
+
+  const user = await getUserByEmail(req.decoded.email)
+  res.json({
+    modules: user.modules
   })
 }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { colors, spacings, fontSizes } from '@styles'
 
 export default class Input extends Component {
 
@@ -35,21 +36,21 @@ export default class Input extends Component {
           }
 
           .label {
-            font-size: .65rem;
+            font-size: ${fontSizes.tiny};
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-bottom: 6px;
+            margin-bottom: ${spacings.small};
             text-transform: uppercase;
           }
 
           .input {
-            border-radius: 3px;
-            margin-bottom: 15px;
-            font-size: .8rem;
+            border-radius: ${spacings.radiusTiny};
+            margin-bottom: ${spacings.big};
+            font-size: ${fontSizes.base};
             height: 1.8rem;
             padding: .3rem;
-            color: rgba(255, 255, 255, .5);
-            background: rgba(155,155,155, .3);
+            color: ${colors.whiteAlpha50};
+            background: ${colors.grayLight};
             outline: none;
             border: none;
             transition: all .5s ease;
@@ -57,12 +58,12 @@ export default class Input extends Component {
 
           .input:hover,
           .input:focus {
-            color: #333;
-            background: rgba(255, 255, 255, .6);
+            color: ${colors.gray};
+            background: ${colors.whiteAlpha60};
           }
 
           .input:focus {
-            box-shadow: inset rgba(35, 128, 251, .9) 0 0 8px;
+            box-shadow: inset ${colors.focusShadow} 0 0 ${spacings.focusShadow};
           }
         `}</style>
       </div>

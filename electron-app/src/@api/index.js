@@ -10,9 +10,34 @@ export default class StackbeeAPI {
 
   constructor(isDev, appSate) {
     this.url = getConnectionUrl(isDev)
+    this.get = this.get.bind(this)
     this.post = this.post.bind(this)
+    this.execute = this.execute.bind(this)
 
     this.token = appSate.auth && appSate.auth.token
+  }
+
+  execute(method, endpoint, data) {
+    switch (method) {
+      default:
+      case 'GET':
+        return this.get(endpoint)
+      case 'POST':
+        return this.post(endpoint, data)
+    }
+  }
+
+  get(endpoint) {
+    return fetch(`${this.url}${endpoint}?token=${this.token}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    }).catch(error => {
+      console.error('🚨🚨 !!StackbeeAPI CRASHED!! 🚨🚨', error)
+      return {}
+    })
   }
 
   post(endpoint, data) {

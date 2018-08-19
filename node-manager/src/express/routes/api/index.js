@@ -14,7 +14,7 @@ import {
   loggo,
 } from './shared/mgmt';
 
-import { saveCsvData } from './shared/mongoose'
+import { saveCsvData, getModules } from './shared/mongoose'
 
 import processCsv from './shared/csvOld';
 import postCsv from './shared/csv';
@@ -40,11 +40,15 @@ router.use(jwtMiddleware);
 router.get('/nginx/proxy.conf', nginxProxyConf);
 router.get('/owncloud/autoconfig.php/:domain', owncloudAutoconfig);
 router.get('/owncloud/update-route/:domain', updateOcRoute);
+
 router.get('/csv/:name', processCsv);
 router.post('/post-csv', postCsv);
 router.post('/printer-upload', printerUploadMiddleware.array('files', 3), printerUpload);
 router.post('/printer-upload-s3', printerUploadMiddlewareS3.array('files', 3), printerUploadS3);
+
+router.get('/modules', getModules);
 router.post('/csvdata', saveCsvData);
+
 router.get('/loggo/:message', loggo);
 
 export default router;

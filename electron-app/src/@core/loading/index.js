@@ -1,4 +1,5 @@
 import { Component, Fragment } from 'react'
+import { colors, spacings } from '@styles'
 
 export default class Loading extends Component {
   componentDidMount() {
@@ -16,6 +17,7 @@ export default class Loading extends Component {
   render() {
     return (
       <Fragment>
+        {/* @see: https://loading.io/css/ */}
         <div className="lds-ripple"><div></div><div></div></div>
         <style jsx>{`
           .lds-ripple {
@@ -24,12 +26,12 @@ export default class Loading extends Component {
             left: 50%;
             transform: translateX(-50%) translateY(-50%);
             display: block;
-            width: 32px;
-            height: 32px;
+            width: ${spacings.grande};
+            height: ${spacings.grande};
           }
           .lds-ripple div {
             position: absolute;
-            border: 4px solid #fff;
+            border: 4px solid ${colors.bright};
             opacity: 1;
             border-radius: 50%;
             animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;

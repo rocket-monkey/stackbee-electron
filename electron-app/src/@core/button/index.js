@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import classNames from 'class-names'
+import { colors, spacings, fontSizes } from '@styles'
 
 export default class Button extends Component {
 
@@ -35,28 +36,30 @@ export default class Button extends Component {
 
         <style jsx>{`
           button {
-            color: rgba(255, 255, 255, .5);
+            color: ${colors.whiteAlpha50};
             text-transform: uppercase;
-            font-size: .65rem;
-            padding: 3px 6px;
-            border-radius: 3px;
-            background: rgba(33,33,33, .6);
-            border: 1px solid rgba(255, 255, 255, .1);
+            font-size: ${fontSizes.tiny};
+            padding: ${spacings.tiny} ${spacings.small};
+            border-radius: ${spacings.radiusTiny};
+            background: ${colors.grayAlpha60};
+            border: 1px solid ${colors.whiteAlpha15};
             outline: none;
             transition: all .5s ease;
           }
 
-          button[disabled] {
-            color: rgba(255, 255, 255, .1);
-            border: 1px solid rgba(33, 33, 33, .4);
-            background: rgba(33,33,33, .2);
+          button[disabled],
+          button[disabled]:hover {
+            color: ${colors.whiteAlpha15};
+            border: 1px solid ${colors.grayAlpha40};
+            background: ${colors.grayAlpha20};
+            cursor: not-allowed;
           }
 
           button:hover,
           button:focus {
-            color: #333;
-            background: rgba(255,255,255, .6);
-            border: 1px solid rgba(255, 255, 255, .4);
+            color: ${colors.gray};
+            background: ${colors.whiteAlpha50};
+            border: 1px solid ${colors.whiteAlpha40};
           }
 
           button > :global(svg) {
@@ -69,21 +72,25 @@ export default class Button extends Component {
 
           button:hover > :global(svg) > :global(g) > :global(path),
           button:focus > :global(svg) > :global(g) > :global(path) {
-            fill: #333;
+            fill: ${colors.gray};
+          }
+          button[disabled]:hover > :global(svg) > :global(g) > :global(path),
+          button[disabled]:focus > :global(svg) > :global(g) > :global(path) {
+            fill: ${colors.grayLight};
           }
 
           button:focus {
-            box-shadow: inset rgba(35, 128, 251, .9) 0 0 8px;
+            box-shadow: inset ${colors.focusShadow} 0 0 ${spacings.focusShadow};
           }
 
           .iconOnly {
-            height: 32px;
+            height: ${spacings.grande};
             padding: 0;
           }
 
           .primary {
-            font-size: .75rem;
-            padding: 6px 9px;
+            font-size: ${fontSizes.small};
+            padding: ${spacings.small} ${spacings.base};
           }
 
           .floatRight {
