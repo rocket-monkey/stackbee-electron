@@ -8,7 +8,7 @@ import Grid from '@core/grid'
 import WithFetch from '@decorators/withFetch'
 import { colors, spacings, fontSizes, zIndexes } from '@styles'
 
-const PER_PAGE = 42
+const PER_PAGE = 23
 
 class PrintersReport extends Component {
   render() {

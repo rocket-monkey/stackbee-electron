@@ -7,6 +7,7 @@ export default {
   whiteAlpha60: 'rgba(255, 255, 255, .6)',
   whiteAlpha50: 'rgba(255, 255, 255, .5)',
   whiteAlpha40: 'rgba(255, 255, 255, .4)',
+  whiteAlpha35: 'rgba(255, 255, 255, .35)',
   blue: 'rgba(94, 158, 246, .15)',
   blueLight: 'rgba(108, 148, 196, .8)',
   blueTurky: 'rgba(126, 219, 254, .8)',

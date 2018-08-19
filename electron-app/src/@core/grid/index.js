@@ -107,11 +107,13 @@ class EditForm extends Component {
             bottom: 38px;
             right: 0;
             z-index: ${zIndexes.top};
-            background: ${colors.grayLightAlpha9};
+            background: linear-gradient(${colors.grayLightAlpha9}, ${colors.grayLightAlpha80});
             transform: translateX(80%);
             opacity: 0;
             transition: all .5s ease;
             padding: ${spacings.big} ${spacings.base};
+            border-left: 1px solid ${colors.grayAlpha20};
+            box-shadow: ${colors.grayAlpha40} -2px 1px 9px;
           }
 
           .active {
@@ -144,6 +146,41 @@ class RowFocus extends Component {
             width: 0;
             margin: 0;
             opacity: .01;
+          }
+        `}</style>
+      </Fragment>
+    )
+  }
+}
+
+class InfoPane extends Component {
+  render() {
+    const { data, perPage = 0 } = this.props
+    const { page = 0, pages = 0, count = 0 } = data || {}
+
+    let displayEnd = page * perPage + perPage
+    if (data && displayEnd > data.count) {
+      displayEnd = data.count
+    }
+
+    return (
+      <Fragment>
+        <div>
+          {page * perPage + 1}&nbsp;-&nbsp;{displayEnd}&nbsp;/&nbsp;<span>{count}</span>
+        </div>
+
+        <style jsx>{`
+          div {
+            line-height: 38px;
+            float: right;
+            font-size: ${fontSizes.small};
+            font-weight: normal;
+            text-transform: initial;
+            font-style: italic;
+          }
+
+          span {
+            font-weight: bold;
           }
         `}</style>
       </Fragment>
@@ -274,6 +311,7 @@ export default class Grid extends Component {
             <tr>
               <th colSpan={3}>
                 <Paginator resetEdit={this.resetEdit} data={data} setPage={this.props.setPage} bodyRef={this.bodyRef.current} loading={loading} />
+                <InfoPane data={data} perPage={perPage} />
               </th>
             </tr>
           </tfoot>
@@ -332,7 +370,7 @@ export default class Grid extends Component {
           }
 
           thead {
-            z-index: ${zIndexes.high};
+            z-index: ${zIndexes.top};
             box-shadow: ${colors.blackAlpha25} 0 2px 5px;
           }
 

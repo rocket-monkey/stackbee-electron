@@ -68,7 +68,7 @@ export default class Input extends Component {
 
           .inverted :global(input) {
             color: ${colors.dark};
-            background: ${colors.grayLightAlpha80};
+            background: ${colors.whiteAlpha35};
           }
 
           .input:hover,
