@@ -19,7 +19,8 @@ app.on('ready', async () => {
     minHeight: 600,
     minWidth: 550,
     backgroundColor: '#333',
-    titleBarStyle: 'hidden'
+    titleBarStyle: 'hidden',
+    frame: false
   })
 
   const devPath = 'http://localhost:8000/start'

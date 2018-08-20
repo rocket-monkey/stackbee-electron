@@ -41,7 +41,6 @@
   },
   "dependencies": {
     "app-root-path": "^2.0.1",
-    "bcrypt": "^2.0.1",
     "class-names": "^1.0.0",
     "csv-parse": "^2.5.0",
     "electron-is-dev": "^0.3.0",
