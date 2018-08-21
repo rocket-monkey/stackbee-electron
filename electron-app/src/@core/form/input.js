@@ -20,18 +20,26 @@ export default class Input extends Component {
     this.inputRef.current.value = value
   }
 
-  componentDidMount() {
+  handleAutoFocus = () => {
     const { autoFocus } = this.props
     if (autoFocus) {
       this.inputRef.current.focus()
     }
   }
 
+  componentDidUpdate() {
+    this.handleAutoFocus()
+  }
+
+  componentDidMount() {
+    this.handleAutoFocus()
+  }
+
   render() {
     const { type = 'text', name = 'unset', value, placeholder, label, disabled, inverted } = this.props
     return (
       <div className={classNames({ 'inverted': inverted })}>
-        {label && <label className="label">{label}</label>}
+        {label && <label className={classNames('label', { 'disabled': disabled })}>{label}</label>}
         <input className="input" type={type} name={name} defaultValue={value} placeholder={placeholder} disabled={disabled} ref={this.inputRef} />
 
         <style jsx>{`
@@ -47,6 +55,11 @@ export default class Input extends Component {
             text-overflow: ellipsis;
             margin-bottom: ${spacings.small};
             text-transform: uppercase;
+          }
+
+          .disabled {
+            cursor: inherit;
+            opacity: .75;
           }
 
           .inverted :global(.label) {
@@ -71,10 +84,14 @@ export default class Input extends Component {
             background: ${colors.whiteAlpha35};
           }
 
-          .input:hover,
-          .input:focus {
+          .input:not([disabled]):hover,
+          .input:not([disabled]):focus {
             color: ${colors.gray};
             background: ${colors.whiteAlpha60};
+          }
+
+          input[disabled] {
+            cursor: inherit;
           }
 
           .input:focus {

@@ -3,9 +3,9 @@ import { action  } from 'mobx'
 import Button from '@core/button'
 import spacings from '@styles/spacings'
 import zIndexes from '@styles/zIndexes'
-import IconArrowLeftLogoutMove from '@icons/IconArrowLeftLogoutMove'
+import IconActionAvatarProfileUser2 from '@icons/IconActionAvatarProfileUser2'
 
-export default class Logout extends Component {
+export default class UserSettings extends Component {
   logout() {
     action(() => {
       this.props.appState.auth = {}
@@ -14,11 +14,12 @@ export default class Logout extends Component {
   }
 
   render() {
-    const { appState, disabled = false } = this.props
+    const { appState} = this.props
+    const disabled = !appState.auth.token
     return (
       <div className="logout">
         <Button onClick={this.logout.bind(this)} title={`logout: ${appState.auth.user}`} disabled={disabled}>
-          <IconArrowLeftLogoutMove />
+          <IconActionAvatarProfileUser2 />
         </Button>
         <style jsx>{`
           div {

@@ -17,6 +17,7 @@ let api = null
 export default observer(
 class LoginRequired extends Component {
   state = {
+    loading: false,
     visible: false,
     error: false,
     success: false
@@ -39,6 +40,7 @@ class LoginRequired extends Component {
     }
 
     console.log('LoginRequired: fetch /authenticate endpoint')
+    this.setState({ loading: true })
 
     api
       .post('/authenticate', {
@@ -47,6 +49,9 @@ class LoginRequired extends Component {
       })
       .then(res => res.json && res.json() || res)
       .then(json => {
+        setTimeout(() => {
+          this.setState({ loading: false  })
+        }, 500)
         if (json.success) {
           // login attempt successful, save token
           const auth = {
@@ -86,7 +91,7 @@ class LoginRequired extends Component {
 
   render() {
     const { children, appState } = this.props
-    const { visible, error, success } = this.state
+    const { loading, visible, error, success } = this.state
     const isLoggedIn = Object.keys(appState.auth).length > 0
 
     if (!visible) {
@@ -102,11 +107,11 @@ class LoginRequired extends Component {
             <FormattedMessage id='@app.login.submit' defaultMessage='Login' />
           </h2>
 
-          <form onSubmit={this.handleSubmit.bind(this)}>
-            <Input type="text" name="username" autoFocus label={<FormattedMessage id='@app.login.username' defaultMessage='Username' />} ref={this.usernameRef} disabled={success} />
-            <Input type="password" name="password" label={<FormattedMessage id='@app.login.password' defaultMessage='Password' />} ref={this.passwordRef} disabled={success} />
+          <form onSubmit={this.handleSubmit.bind(this)} className={classNames({ 'loading': loading })}>
+            <Input type="text" name="username" autoFocus label={<FormattedMessage id='@app.login.username' defaultMessage='Username' />} ref={this.usernameRef} disabled={success || loading} />
+            <Input type="password" name="password" label={<FormattedMessage id='@app.login.password' defaultMessage='Password' />} ref={this.passwordRef} disabled={success || loading} />
 
-            <Button type="submit" primary floatRight disabled={error || success}>
+            <Button type="submit" primary floatRight disabled={error || success || loading}>
               <FormattedMessage id='@app.login.submit' defaultMessage='Login' />
             </Button>
 
@@ -127,6 +132,10 @@ class LoginRequired extends Component {
               margin: 0 auto;
               position: relative;
               padding-bottom: 29px;
+            }
+
+            .loading {
+              cursor: progress;
             }
 
             button {

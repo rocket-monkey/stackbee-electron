@@ -5,7 +5,7 @@ import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import DragArea from './dragArea'
 import AdminLink from './adminLink'
-import Logout from './logout'
+import UserSettings from './userSettings'
 import Content from './content'
 import { colors, spacings, fontSizes, zIndexes } from '@styles'
 
@@ -28,7 +28,7 @@ class Layout extends Component {
 
     return (
       <div>
-        <Logout appState={appState} disabled={!decodedJwt} />
+        <UserSettings appState={appState} />
         {isAdmin && <AdminLink isAdminRoute={isAdminRoute} />}
         <DragArea />
         <Content appState={appState} children={mappedChildren} />
