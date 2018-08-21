@@ -1,6 +1,6 @@
 {
-  "name": "stackbee-io-electron",
-  "version": "1.0.0",
+  "name": "stackbee.io",
+  "version": "0.0.1",
   "description": "A specialized Electron application for the customers of stackbee.io",
   "main": "main/index.js",
   "scripts": {
@@ -34,6 +34,7 @@
     "babel-plugin-react-intl": "^2.4.0",
     "electron": "^2.0.0",
     "electron-builder": "^20.15.1",
+    "electron-packager": "^12.1.1",
     "next": "^6.0.4-canary.7",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
