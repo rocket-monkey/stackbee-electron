@@ -1,1 +1,10 @@
 .vscode
+.next/
+renderer/.next/
+renderer/out
+_next/
+.idea/
+dist/
+node_modules
+yarn-error.log
+.messages
