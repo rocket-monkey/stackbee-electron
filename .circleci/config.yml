@@ -6,9 +6,7 @@ jobs:
 
     steps:
         - checkout
-        -run:
-          name: Install Homebrew
-          command: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
 
         -run:
           name: Install Yarn
@@ -30,7 +28,7 @@ jobs:
   #     - run: <command>
 workflows:
   version: 2
-  build_and_test:
+  build-and-test:
     jobs:
       - build
       # - test
