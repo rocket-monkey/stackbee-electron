@@ -4,22 +4,6 @@ jobs:
     macos:
       xcode: "9.0"
 
-    steps:
-        - checkout
-
-
-        -run:
-          name: Install Yarn
-          command: brew install yarn --without-node
-
-        -run:
-          name: Install packages
-          command: yarn install
-
-        -run:
-          name: Build electron app for macOS
-          command: yarn dist
-
   # test:
   #   docker:
   #     - image: circleci/node:10-browsers
