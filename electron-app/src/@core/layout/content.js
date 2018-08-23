@@ -1,6 +1,10 @@
 import React, { Component, Fragment } from 'react'
 import { observer } from 'mobx-react'
+import WithIntl from '@decorators/withIntl'
 import { LogoSmall } from '@core/logo'
+import AdminLink from './adminLink'
+import UserSettings from './userSettings'
+import OfflineBadge from './offlineBadge'
 import LanguageSwitcher from './languageSwitcher'
 import { colors, spacings } from '@styles'
 
@@ -16,17 +20,16 @@ class Content extends Component {
     ))
   )
 
-  render () {
-    const { appState } = this.props
+  render() {
+    const { appState, isAdminRoute } = this.props
     return (
       <Fragment>
-        {
-          appState.langs &&
-          <Fragment>
-            <LogoSmall sticker />
-            <LanguageSwitcher appState={appState} />
-          </Fragment>
-        }
+        <UserSettings appState={appState} />
+        <AdminLink appState={appState} isAdminRoute={isAdminRoute} />
+        <OfflineBadge appState={appState} />
+
+        <LogoSmall sticker />
+        <LanguageSwitcher appState={appState} />
 
         {this.renderChildren()}
 
@@ -44,4 +47,4 @@ class Content extends Component {
   }
 }
 
-export default observer(Content)
+export default WithIntl(observer(Content))

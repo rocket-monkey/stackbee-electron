@@ -7,6 +7,7 @@ export const LogoSmall = ({ sticker }) => (
   <div title="stackbee.io" className={classNames({ 'sticker': sticker, 'nonSticker': !sticker })}>
     {sticker && <Link href="/start"><IconStackbee /></Link>}
     {!sticker && <IconStackbee />}
+
     <style jsx>{`
       div {
         width: ${spacings.grande};
@@ -26,10 +27,11 @@ export const LogoSmall = ({ sticker }) => (
       }
       .sticker {
         position: absolute;
-        bottom: 29px;
-        right: 0;
+        bottom: -4px;
+        right: -4px;
         overflow: hidden;
         cursor: pointer;
+        z-index: ${zIndexes.top};
       }
     `}</style>
   </div>

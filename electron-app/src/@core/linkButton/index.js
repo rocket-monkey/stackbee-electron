@@ -42,7 +42,7 @@ export default class LinkButton extends Component {
             border: 1px solid ${colors.whiteAlpha15};
             outline: none;
             transition: all .5s ease;
-            cursor: default;
+            cursor: pointer;
           }
 
           .link:hover,

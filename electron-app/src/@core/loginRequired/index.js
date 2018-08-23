@@ -9,6 +9,7 @@ import Loading from '@core/loading'
 import Form from '@core/form'
 import Input from '@core/form/input'
 import Logo from '@core/logo'
+import SuccessError from '@core/successError'
 import StackbeeAPI from '@api'
 import { colors, spacings, fontSizes } from '@styles'
 
@@ -110,13 +111,7 @@ class LoginRequired extends Component {
                     <FormattedMessage id='@app.login.submit' defaultMessage='Login' />
                   </Button>
 
-                  <div className={classNames('errorPane', { 'paneActive': this.state.error })}>
-                    <FormattedMessage id='@app.login.error' defaultMessage='Login attempt failed' />
-                  </div>
-
-                  <div className={classNames('successPane', { 'paneActive': this.state.success })}>
-                    <FormattedMessage id='@app.login.success' defaultMessage='Logged in successful!' />
-                  </div>
+                  <SuccessError error={this.state.error} success={this.state.success} />
                 </Fragment>
               )}
             </Form>
@@ -129,35 +124,6 @@ class LoginRequired extends Component {
 
             .offline > :global(form) {
               opacity: .25;
-            }
-
-            .errorPane,
-            .successPane {
-              position: absolute;
-              bottom: 0;
-              left: 0;
-              color: ${colors.bright};
-              opacity: 0;
-              pointer-events: none;
-              border-radius: ${spacings.radiusTiny};
-              padding: ${spacings.small} ${spacings.base};
-              border: 1px solid ${colors.whiteAlpha15};
-              box-shadow: inset ${colors.purple} 0 0 ${spacings.tiny};
-              text-transform: uppercase;
-              font-size: ${fontSizes.small};
-              background: ${colors.redDark};
-              transition: opacity .3s ease, transform .5s ease;
-              transform: translateY(50%) rotateZ(6deg);
-            }
-
-            .successPane {
-              box-shadow: inset ${colors.mintGreen} 0 0 3px;
-              background: ${colors.green};
-            }
-
-            .paneActive {
-              opacity: 1;
-              transform: translateY(0%);
             }
           `}</style>
         </NoSSR>

@@ -27,6 +27,7 @@ export default class StackbeeAPI {
   }
 
   onLivenessProbeFailure = action(() => {
+    console.log('LivenessProbe failed!')
     this.appState.online = false
     // this.appState.auth = {}
   })

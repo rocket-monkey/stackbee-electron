@@ -1,6 +1,5 @@
 import { Component  } from 'react'
-import { defineMessages } from 'react-intl'
-import { action  } from 'mobx'
+import { injectIntl, defineMessages } from 'react-intl'
 import LinkButton from '@core/linkButton'
 import spacings from '@styles/spacings'
 import zIndexes from '@styles/zIndexes'
@@ -14,14 +13,7 @@ const msgs = defineMessages({
   }
 })
 
-export default class UserSettings extends Component {
-  logout() {
-    action(() => {
-      this.props.appState.auth = {}
-    })()
-    localStorage.removeItem('auth')
-  }
-
+class UserSettings extends Component {
   render() {
     const { appState, intl } = this.props
     const disabled = !appState.auth.token
@@ -30,8 +22,6 @@ export default class UserSettings extends Component {
         <LinkButton href="/userSettings" title={intl.formatMessage(msgs.userSettings)}>
           <IconActionAvatarProfileUser2 />
         </LinkButton>
-
-        {/* <Button onClick={this.logout.bind(this)} title={`logout: ${appState.auth.user}`} disabled={disabled}></Button> */}
 
         <style jsx>{`
           div {
@@ -45,3 +35,5 @@ export default class UserSettings extends Component {
     )
   }
 }
+
+export default injectIntl(UserSettings)

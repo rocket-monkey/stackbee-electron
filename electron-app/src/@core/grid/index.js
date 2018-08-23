@@ -94,8 +94,8 @@ class EditForm extends Component {
           })}
 
           <Button type="submit" primary floatRight>
-              <FormattedMessage id='@app.printer.editData.submit' defaultMessage='Save' />
-            </Button>
+            <FormattedMessage id='@app.printer.editData.submit' defaultMessage='Save' />
+          </Button>
         </form>
 
         <style jsx>{`
