@@ -1,3 +1,7 @@
+import { action } from 'mobx'
+
+const isDev = require('electron-is-dev')
+
 const getConnectionUrl = (isDev) => {
   const url = isDev ? 'http://localhost:3000/api' : 'http://localhost:3000/api'
   console.log('API route: ', url)
@@ -5,19 +9,37 @@ const getConnectionUrl = (isDev) => {
 }
 
 export default class StackbeeAPI {
+  appState = null
   url = ''
   token = null
 
   constructor(isDev, appSate) {
     this.url = getConnectionUrl(isDev)
-    this.get = this.get.bind(this)
-    this.post = this.post.bind(this)
-    this.execute = this.execute.bind(this)
 
+    this.appState = appSate
     this.token = appSate.auth && appSate.auth.token
+
+    this.livenessProbe()
+    if (!isDev) {
+      console.warn('Start liveness probe interval...')
+      setInterval(this.livenessProbe, 1000 * 60 * 5)
+    }
   }
 
-  execute(method, endpoint, data) {
+  onLivenessProbeFailure = action(() => {
+    this.appState.online = false
+    // this.appState.auth = {}
+  })
+
+  livenessProbe = () => {
+    // TODO: when 200 ok, also check validity of a possible stored token!
+    this
+      .get('?livenessProbe=true')
+      .then(res => res.status !== 200 && this.onLivenessProbeFailure())
+      .catch(_ => this.onLivenessProbeFailure())
+  }
+
+  execute = (method, endpoint, data) => {
     switch (method) {
       default:
       case 'GET':
@@ -27,7 +49,7 @@ export default class StackbeeAPI {
     }
   }
 
-  get(endpoint) {
+  get = (endpoint) => {
     return fetch(`${this.url}${endpoint}${endpoint.includes('?') ? '&' : '?'}token=${this.token}`, {
       method: 'GET',
       headers: {
@@ -40,7 +62,7 @@ export default class StackbeeAPI {
     })
   }
 
-  post(endpoint, data) {
+  post = (endpoint, data) => {
     return fetch(`${this.url}${endpoint}${endpoint.includes('?') ? '&' : '?'}token=${this.token}`, {
       method: 'POST',
       headers: {

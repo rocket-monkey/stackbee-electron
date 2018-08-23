@@ -6,6 +6,7 @@ import classNames from 'class-names'
 import NoSSR from 'react-no-ssr'
 import Button from '@core/button'
 import Loading from '@core/loading'
+import Form from '@core/form'
 import Input from '@core/form/input'
 import Logo from '@core/logo'
 import StackbeeAPI from '@api'
@@ -14,10 +15,8 @@ import { colors, spacings, fontSizes } from '@styles'
 const isDev = require('electron-is-dev')
 let api = null
 
-export default observer(
 class LoginRequired extends Component {
   state = {
-    loading: false,
     visible: false,
     error: false,
     success: false
@@ -25,58 +24,50 @@ class LoginRequired extends Component {
 
   errorTimer = null
 
-  constructor(props) {
-    super(props)
-    this.usernameRef = React.createRef()
-    this.passwordRef = React.createRef()
-  }
+  handleSubmit = (values) => {
+    return new Promise((resolve, reject) => {
+      const { error, success } = this.state
+      if (error || success) {
+        console.info('LoginRequired: already in error or success state - abort!')
+        reject()
+        return
+      }
 
-  handleSubmit = (event) => {
-    event.preventDefault()
-    const { error, success } = this.state
-    if (error || success) {
-      console.info('LoginRequired: already in error or success state - abort!')
-      return
-    }
+      console.log('LoginRequired: fetch /authenticate endpoint')
 
-    console.log('LoginRequired: fetch /authenticate endpoint')
-    this.setState({ loading: true })
+      api
+        .post('/authenticate', {
+          name: values.username,
+          password: values.password
+        })
+        .then(res => res.json && res.json() || res)
+        .then(json => {
+          if (json.success) { // login attempt successful, save token
+            const auth = {
+              user: values.username,
+              token: json.token
+            }
 
-    api
-      .post('/authenticate', {
-        name: this.usernameRef.current.getValue(),
-        password: this.passwordRef.current.getValue()
-      })
-      .then(res => res.json && res.json() || res)
-      .then(json => {
-        setTimeout(() => {
-          this.setState({ loading: false  })
-        }, 500)
-        if (json.success) {
-          // login attempt successful, save token
-          const auth = {
-            user: this.usernameRef.current.getValue(),
-            token: json.token
-          }
-
-          this.setState({ success: true  })
-          setTimeout(() => {
-            this.setState({ success: false })
+            this.setState({ success: true  })
             setTimeout(() => {
-              localStorage.setItem('auth', JSON.stringify(auth))
-              action(() => {
-                this.props.appState.auth = auth
-              })()
-            }, 300)
-          }, 1000)
-        } else {
-          // login attempt failed, show error
-          this.setState({ error: true })
-          clearTimeout(this.errorTimer)
-          this.errorTimer = setTimeout(() => {
-            this.setState({ error: false  })
-          }, 2500)
-        }
+              this.setState({ success: false })
+              setTimeout(() => {
+                resolve()
+                localStorage.setItem('auth', JSON.stringify(auth))
+                action(() => {
+                  this.props.appState.auth = auth
+                })()
+              }, 300)
+            }, 1000)
+          } else { // login attempt failed, show error
+            reject()
+            this.setState({ error: true })
+            clearTimeout(this.errorTimer)
+            this.errorTimer = setTimeout(() => {
+              this.setState({ error: false  })
+            }, 2500)
+          }
+        })
       })
   }
 
@@ -91,8 +82,9 @@ class LoginRequired extends Component {
 
   render() {
     const { children, appState } = this.props
-    const { loading, visible, error, success } = this.state
+    const { visible, error, success } = this.state
     const isLoggedIn = Object.keys(appState.auth).length > 0
+    const offline = !appState.online
 
     if (!visible) {
       return <Loading />
@@ -107,39 +99,36 @@ class LoginRequired extends Component {
             <FormattedMessage id='@app.login.submit' defaultMessage='Login' />
           </h2>
 
-          <form onSubmit={this.handleSubmit.bind(this)} className={classNames({ 'loading': loading })}>
-            <Input type="text" name="username" autoFocus label={<FormattedMessage id='@app.login.username' defaultMessage='Username' />} ref={this.usernameRef} disabled={success || loading} />
-            <Input type="password" name="password" label={<FormattedMessage id='@app.login.password' defaultMessage='Password' />} ref={this.passwordRef} disabled={success || loading} />
+          <div className={classNames({ 'offline': offline })}>
+            <Form onSubmit={this.handleSubmit.bind(this)}>
+              {(isValid, loading, resetForm, getFieldRef) => (
+                <Fragment>
+                  <Input type="text" name="username" isRequired autoFocus label={<FormattedMessage id='@app.login.username' defaultMessage='Username' />} disabled={success || loading || offline} />
+                  <Input type="password" name="password" isRequired label={<FormattedMessage id='@app.login.password' defaultMessage='Password' />} disabled={success || loading || offline} />
 
-            <Button type="submit" primary floatRight disabled={error || success || loading}>
-              <FormattedMessage id='@app.login.submit' defaultMessage='Login' />
-            </Button>
+                  <Button type="submit" primary floatRight disabled={error || success || loading || offline}>
+                    <FormattedMessage id='@app.login.submit' defaultMessage='Login' />
+                  </Button>
 
-            <div className={classNames('errorPane', { 'paneActive': this.state.error })}>
-              <FormattedMessage id='@app.login.error' defaultMessage='Login attempt failed' />
-            </div>
+                  <div className={classNames('errorPane', { 'paneActive': this.state.error })}>
+                    <FormattedMessage id='@app.login.error' defaultMessage='Login attempt failed' />
+                  </div>
 
-            <div className={classNames('successPane', { 'paneActive': this.state.success })}>
-              <FormattedMessage id='@app.login.success' defaultMessage='Logged in successful!' />
-            </div>
-          </form>
+                  <div className={classNames('successPane', { 'paneActive': this.state.success })}>
+                    <FormattedMessage id='@app.login.success' defaultMessage='Logged in successful!' />
+                  </div>
+                </Fragment>
+              )}
+            </Form>
+          </div>
 
           <style jsx>{`
-            form {
-              width: 50%;
-              max-width: 500px;
-              min-width: 300px;
-              margin: 0 auto;
-              position: relative;
-              padding-bottom: 29px;
-            }
-
-            .loading {
-              cursor: progress;
-            }
-
             button {
               float: right;
+            }
+
+            .offline > :global(form) {
+              opacity: .25;
             }
 
             .errorPane,
@@ -181,4 +170,6 @@ class LoginRequired extends Component {
       </NoSSR>
     )
   }
-})
+}
+
+export default observer(LoginRequired)

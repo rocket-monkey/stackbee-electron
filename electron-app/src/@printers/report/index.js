@@ -14,7 +14,7 @@ class PrintersReport extends Component {
   render() {
     const { loading, error, data } = this.props
 
-    const hasError = (data && !data.docs) || error
+    const hasError = (data && data !== false && !data.docs) || error
 
     return (
       <div>

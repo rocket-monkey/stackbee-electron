@@ -1,9 +1,18 @@
 import { Component  } from 'react'
+import { defineMessages } from 'react-intl'
 import { action  } from 'mobx'
-import Button from '@core/button'
+import LinkButton from '@core/linkButton'
 import spacings from '@styles/spacings'
 import zIndexes from '@styles/zIndexes'
 import IconActionAvatarProfileUser2 from '@icons/IconActionAvatarProfileUser2'
+
+const msgs = defineMessages({
+  userSettings: {
+    id: '@app.userSettingsLink.title',
+    description: 'Title for userSettings link button.',
+    defaultMessage: 'User settings'
+  }
+})
 
 export default class UserSettings extends Component {
   logout() {
@@ -14,13 +23,16 @@ export default class UserSettings extends Component {
   }
 
   render() {
-    const { appState} = this.props
+    const { appState, intl } = this.props
     const disabled = !appState.auth.token
     return (
       <div className="logout">
-        <Button onClick={this.logout.bind(this)} title={`logout: ${appState.auth.user}`} disabled={disabled}>
+        <LinkButton href="/userSettings" title={intl.formatMessage(msgs.userSettings)}>
           <IconActionAvatarProfileUser2 />
-        </Button>
+        </LinkButton>
+
+        {/* <Button onClick={this.logout.bind(this)} title={`logout: ${appState.auth.user}`} disabled={disabled}></Button> */}
+
         <style jsx>{`
           div {
             position: absolute;

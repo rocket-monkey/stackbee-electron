@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react'
 import { observer } from 'mobx-react'
-import WithIntl from '@decorators/withIntl'
 import { LogoSmall } from '@core/logo'
 import LanguageSwitcher from './languageSwitcher'
 import { colors, spacings } from '@styles'
@@ -45,4 +44,4 @@ class Content extends Component {
   }
 }
 
-export default observer(WithIntl(Content))
+export default observer(Content)

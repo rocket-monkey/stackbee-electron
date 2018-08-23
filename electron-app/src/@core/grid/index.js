@@ -72,8 +72,7 @@ class EditForm extends Component {
   }
 
   render() {
-    const { fields, loading, docs } = this.props
-    const { edit } = this.state
+    const { fields, loading, docs, edit } = this.props
 
     if (!docs) {
       return null
@@ -293,8 +292,8 @@ export default class Grid extends Component {
   }
 
   editRow(index) {
-    this.selectRow(index)
     this.setState({ edit: index })
+    this.selectRow(index)
   }
 
   setFocus(index) {
@@ -302,8 +301,9 @@ export default class Grid extends Component {
       return
     }
     if (index) {
+      // TODO: only make on real focus event!
       return setTimeout(() => {
-        this.setState({ focus: index  })
+        // this.setState({ focus: index  })
       }, 10)
     }
 
@@ -337,9 +337,15 @@ export default class Grid extends Component {
     const { loading, data, perPage, fields } = this.props
     const { page = 0, pages = 0 } = data || {}
 
+    console.log('rerender', this.state.edit)
+
     return (
       <div className="table">
-        <EditForm loading={loading} fields={fields} edit={this.state.edit} docs={data && data.docs} />
+        {
+          this.state.edit > -1 &&
+          <EditForm loading={loading} fields={fields} edit={this.state.edit} docs={data && data.docs} />
+        }
+
         <table className={classNames({ 'loading': loading, 'splitView': this.state.edit > -1 })}>
           <thead>
             <tr>

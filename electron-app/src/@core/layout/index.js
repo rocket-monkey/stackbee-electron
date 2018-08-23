@@ -1,23 +1,28 @@
 import React, { Component } from 'react'
+import { compose } from 'recompose'
+import { injectIntl } from 'react-intl'
 import Link from 'next/link'
 import jwtDecode from 'jwt-decode'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
+import WithIntl from '@decorators/withIntl'
 import DragArea from './dragArea'
 import AdminLink from './adminLink'
 import UserSettings from './userSettings'
+import OfflineBadge from './offlineBadge'
 import Content from './content'
 import { colors, spacings, fontSizes, zIndexes } from '@styles'
 
 export const appState = observable({
+  online: true,
   locale: 'en',
   langs: null,
   auth: {}
 })
-export default observer(
+
 class Layout extends Component {
   render () {
-    const { children, appState, isAdminRoute } = this.props
+    const { children, appState, isAdminRoute, intl } = this.props
 
     const mappedChildren = React.Children.map(children, child => {
       return React.createElement(child.type, {...child.props, appState: this.props.appState}, child.props.children)
@@ -28,7 +33,8 @@ class Layout extends Component {
 
     return (
       <div>
-        <UserSettings appState={appState} />
+        <OfflineBadge appState={appState} />
+        <UserSettings appState={appState} intl={intl} />
         {isAdmin && <AdminLink isAdminRoute={isAdminRoute} />}
         <DragArea />
         <Content appState={appState} children={mappedChildren} />
@@ -80,4 +86,10 @@ class Layout extends Component {
       </div>
     )
   }
-})
+}
+
+export default compose(
+  WithIntl,
+  injectIntl,
+  observer
+)(Layout)
