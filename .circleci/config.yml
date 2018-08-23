@@ -9,12 +9,15 @@ jobs:
         -run:
           name: Install Homebrew
           command: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
         -run:
           name: Install Yarn
           command: brew install yarn --without-node
+
         -run:
           name: Install packages
           command: yarn install
+
         -run:
           name: Build electron app for macOS
           command: yarn dist
@@ -27,7 +30,7 @@ jobs:
   #     - run: <command>
 workflows:
   version: 2
-  build:
+  build_and_test:
     jobs:
       - build
       # - test
