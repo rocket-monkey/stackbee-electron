@@ -8,20 +8,16 @@ jobs:
         - checkout
         -run:
           name: Install Homebrew
-          command: |
-            /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+          command: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         -run:
           name: Install Yarn
-          command: |
-            brew install yarn --without-node
+          command: brew install yarn --without-node
         -run:
           name: Install packages
-          command: |
-            yarn install
+          command: yarn install
         -run:
           name: Build electron app for macOS
-          command: |
-            yarn dist
+          command: yarn dist
 
   # test:
   #   docker:
