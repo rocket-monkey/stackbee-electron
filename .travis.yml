@@ -29,7 +29,7 @@ before_install:
 - cat $HOME/.bash_profile
 - echo "export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\"\n" > $HOME/.bashrc
 - cat $HOME/.bashrc
-- [[ -s "$HOME/.bashrc" ]] && source "$HOME/.bashrc"
+- source "$HOME/.bashrc"
 - yarn -v
 install:
 - nvm install 10.9.0
