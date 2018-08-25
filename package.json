@@ -4,14 +4,14 @@
   "description": "A specialized Electron application for the customers of stackbee.io",
   "main": "main/index.js",
   "scripts": {
-    "postinstall": "install-app-deps",
+    "postinstall": "electron-builder install-app-deps",
     "start": "electron ./app",
     "dev": "cross-env NODE_ENV=development yarn start",
-    "intl:pot": "react-intl-po json2pot './src/@lang/.messages/**/*.json' -o './src/@lang/messages.pot'",
-    "intl:json": "react-intl-po po2json './src/@lang/translations/messages.*.po' -m './src/@lang/.messages/**/*.json' -o './src/@lang/messages.json'",
+    "intl:pot": "react-intl-po json2pot './app/src/@lang/.messages/**/*.json' -o './app/src/@lang/messages.pot'",
+    "intl:json": "react-intl-po po2json './app/src/@lang/translations/messages.*.po' -m './app/src/@lang/.messages/**/*.json' -o './app/src/@lang/messages.json'",
     "build": "next build app/renderer && next export app/renderer",
     "dist": "cross-env NODE_ENV=production yarn run build && build -mwl --x64 --ia32",
-    "dist:current": "cross-env NODE_ENV=production yarn run build && build"
+    "dist:current": "cross-env NODE_ENV=production yarn run build && electron-builder build"
   },
   "build": {
     "appId": "stackbee-electron",
