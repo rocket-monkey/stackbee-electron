@@ -1,11 +1,11 @@
-import { Component, Fragment } from 'react'
+import { PureComponent, Fragment } from 'react'
 import { colors, spacings } from '@styles'
 
-export default class Loading extends Component {
+export default class Loading extends PureComponent {
   componentDidMount() {
     // open dev-tools in production
     const { globalShortcut, BrowserWindow } = require('electron').remote
-    globalShortcut.register('CommandOrControl+Shift+Z', () => {
+    globalShortcut.register('Control+Shift+S', () => {
       BrowserWindow.getFocusedWindow().webContents.openDevTools()
     })
 

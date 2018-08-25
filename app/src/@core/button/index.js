@@ -3,8 +3,16 @@ import classNames from 'class-names'
 import { colors, spacings, fontSizes } from '@styles'
 
 export default class Button extends Component {
+  hasOnlyOneRealReactElementChild = (children) => {
+    if (!children) {
+      return false
+    }
 
-  onClick(event) {
+    const count = React.Children.count(children)
+    return React.isValidElement(children[0]) && count === 1
+  }
+
+  onClick = (event) => {
     const { onClick } = this.props
     if (onClick) {
       onClick(event)
@@ -13,20 +21,15 @@ export default class Button extends Component {
 
   render() {
     const { type = 'submit', primary, floatRight, disabled, title, children } = this.props
-    let childType = children.type || ''
-    if (typeof childType === 'function') {
-      childType = children.type.toString()
-    }
-
     return (
       <Fragment>
         <button
           type={type}
           disabled={disabled}
           title={title}
-          onClick={this.onClick.bind(this)}
+          onClick={this.onClick}
           className={classNames({
-            'iconOnly': childType.includes('Icon') && React.Children.count(children) === 1,
+            'iconOnly': this.hasOnlyOneRealReactElementChild(children),
             'floatRight': floatRight === true,
             'primary': primary === true
           })}

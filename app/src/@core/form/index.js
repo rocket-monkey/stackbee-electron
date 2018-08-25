@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import { injectIntl } from 'react-intl'
+import isElementOfType from '@helpers/isElementOfType'
+import Input from '@core/form/input'
 import classNames from 'class-names'
 
 const isDev = require('electron-is-dev')
@@ -16,23 +18,16 @@ class Form extends Component {
     this.formRef = React.createRef()
   }
 
-  isTypeSupported = (type) => {
-    if (typeof type !== 'string') {
-      type = type.toString()
-    }
-
-    if (typeof type.includes === 'undefined') {
-      return console.info('YOU DONE FUCK UP!')
-    }
-
-    return (
-      type.includes('Input')
-    )
+  isTypeSupported = (child) => {
+    // check for props that _must_ exist on every input field - and no others involved in form-building!
+    // -> super stupid i know, but any "instanceof" or class instantiation and checking with functions that return types as string fails in prod
+    // return !!child && !!child.props && !!child.props.name && (!!child.props.label || !!child.props.placeholder)
+    return isElementOfType(child, Input)
   }
 
   forAllFields = (method) => {
     React.Children.map(this.getChildren(), (child, index) => {
-      if (this.isTypeSupported(child.type)) {
+      if (this.isTypeSupported(child)) {
         const inputRef = this.refs[child.props.name]
         method(inputRef, child.props.name)
       }
@@ -115,7 +110,7 @@ class Form extends Component {
 
   renderChildren = () => {
     return React.Children.map(this.getChildren(), (child, index) => {
-      if (this.isTypeSupported(child.type)) {
+      if (this.isTypeSupported(child)) {
         return React.createElement(child.type, {
           ...child.props,
           key: `form-child-${index}`,

@@ -4,8 +4,16 @@ import classNames from 'class-names'
 import { colors, spacings, fontSizes } from '@styles'
 
 export default class LinkButton extends Component {
+  hasOnlyOneRealReactElementChild = (children) => {
+    if (!children) {
+      return false
+    }
 
-  onClick(event) {
+    const count = React.Children.count(children)
+    return React.isValidElement(children[0]) && count === 1
+  }
+
+  onClick = (event) => {
     const { onClick  } = this.props
     if (onClick) {
       onClick(event)
@@ -14,16 +22,12 @@ export default class LinkButton extends Component {
 
   render() {
     const { href, primary, floatRight, disabled, title, children } = this.props
-    let childType = children.type || ''
-    if (typeof childType === 'function') {
-      childType = children.type.toString()
-    }
     return (
       <div
         title={title}
         onClick={this.onClick.bind(this)}
         className={classNames('link', {
-          'iconOnly': childType.includes('Icon') && React.Children.count(children) === 1,
+          'iconOnly': this.hasOnlyOneRealReactElementChild(children),
           'floatRight': floatRight === true,
           'primary': primary === true
         })}

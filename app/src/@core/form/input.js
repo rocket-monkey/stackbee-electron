@@ -1,49 +1,10 @@
 import React, { Component } from 'react'
-import { defineMessages } from 'react-intl'
 import classNames from 'class-names'
+import InputBase from './inputBase'
 import Validation from './validation'
 import { colors, spacings, fontSizes } from '@styles'
 
-const msgs = defineMessages({
-  validationIsRequired: {
-    id: '@app.input.validation.required',
-    description: 'Validation error for isRequired.',
-    defaultMessage: 'Value cannot be empty'
-  }
-})
-export default class Input extends Component {
-  state = {
-    errorMsg: null
-  }
-
-  constructor(props) {
-    super(props)
-    this.inputRef = React.createRef()
-  }
-
-  getValue = () => {
-    return this.inputRef.current.value
-  }
-
-  setValue = (value) => {
-    this.inputRef.current.value = value
-  }
-
-  reset = (resetValueToo) => {
-    if (resetValueToo) {
-      this.setValue('')
-    }
-
-    this.setState({ errorMsg: null })
-  }
-
-  handleAutoFocus = () => {
-    const { autoFocus } = this.props
-    if (autoFocus) {
-      this.inputRef.current.focus()
-    }
-  }
-
+export default class Input extends InputBase {
   validate = (event) => {
     const { isRequired } = this.props
     const { errorMsg } = this.state
@@ -58,7 +19,7 @@ export default class Input extends Component {
 
     let newErrorMsg = null
     if (isRequired && value.length === 0) {
-      newErrorMsg = this.props.intl.formatMessage(msgs.validationIsRequired)
+      newErrorMsg = this.props.intl.formatMessage(this.getMessages('validationIsRequired'))
     }
 
     if (newErrorMsg !== errorMsg) {
@@ -66,21 +27,6 @@ export default class Input extends Component {
     }
 
     return newErrorMsg
-  }
-
-  handleBlurOrChange = (event) => {
-    this.validate(event)
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const isValidationStateChange = prevState.errorMsg !== this.state.errorMsg
-    if (!isValidationStateChange) {
-      this.handleAutoFocus()
-    }
-  }
-
-  componentDidMount() {
-    this.handleAutoFocus()
   }
 
   render() {

@@ -1,19 +1,21 @@
 const path = require('path')
+const moduleResolver = require('babel-plugin-module-resolver')
+const reactIntl = require('babel-plugin-react-intl')
 
 const resolverOptions = {
-  "root": ["."],
+  "root": ["./app"],
   "cwd": "babelrc",
   "alias": {
-    "@api": "./src/@api",
-    "@config": "./src/@config",
-    "@decorators": "./src/@decorators",
-    "@core": "./src/@core",
-    "@sites": "./src/@sites",
-    "@lang": "./src/@lang",
-    "@helpers": "./src/@helpers",
-    "@icons": "./src/@icons",
-    "@printers": "./src/@printers",
-    "@styles": "./src/@styles"
+    "@api": "./app/src/@api",
+    "@config": "./app/src/@config",
+    "@decorators": "./app/src/@decorators",
+    "@core": "./app/src/@core",
+    "@sites": "./app/src/@sites",
+    "@lang": "./app/src/@lang",
+    "@helpers": "./app/src/@helpers",
+    "@icons": "./app/src/@icons",
+    "@printers": "./app/src/@printers",
+    "@styles": "./app/src/@styles"
   }
 }
 
@@ -29,9 +31,9 @@ module.exports = {
 
     // Inject babel plugins, especially for our module-resolver and styled-jsx
     defaultLoaders.babel.options.plugins = [
-      ['module-resolver', resolverOptions],
+      [moduleResolver, resolverOptions],
       ['styled-jsx/babel', { 'optimizeForSpeed': true }],
-      ['react-intl', { 'messagesDir': 'src/@lang/.messages/' }]
+      [reactIntl, { 'messagesDir': 'app/src/@lang/.messages/' }]
     ]
 
     // As soon as we inject babel plugins, we have to add this rule otherwise JSX is suddenly unsupported oO
