@@ -32,7 +32,7 @@ install:
 - nvm install 10.9.0
 - yarn
 script:
-- yarn dist:current
+- yarn dist
 branches:
   except:
   - "/^v\\d+\\.\\d+\\.\\d+$/"
