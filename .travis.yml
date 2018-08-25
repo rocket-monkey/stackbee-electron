@@ -33,8 +33,8 @@ before_install:
 - yarn -v
 install:
 - nvm install 10.9.0
-- yarn install electron-builder@next
-- yarn install
+- yarn add electron-builder@next
+- yarn
 script:
 - yarn run dist
 branches:
