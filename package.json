@@ -10,8 +10,7 @@
     "intl:pot": "react-intl-po json2pot './app/src/@lang/.messages/**/*.json' -o './app/src/@lang/messages.pot'",
     "intl:json": "react-intl-po po2json './app/src/@lang/translations/messages.*.po' -m './app/src/@lang/.messages/**/*.json' -o './app/src/@lang/messages.json'",
     "build": "next build app/renderer && next export app/renderer",
-    "dist": "cross-env NODE_ENV=production yarn run build && build -wl --x64 --ia32",
-    "dist:current": "cross-env NODE_ENV=production yarn run build && electron-builder build"
+    "release": "cross-env NODE_ENV=production yarn run build && electron-builder build --x64 --ia32"
   },
   "build": {
     "appId": "stackbee-electron",
@@ -22,7 +21,10 @@
     ],
     "win": {
       "icon": "http://stackbee.io.app.s3.amazonaws.com/icon.ico"
-    }
+    },
+    "publish": [
+      "github"
+    ]
   },
   "repository": "https://github.com/rocket-monkey/stackbee-electron",
   "bugs": {

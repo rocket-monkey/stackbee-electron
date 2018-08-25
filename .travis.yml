@@ -28,16 +28,16 @@ script:
         -v ~/.cache/electron:/root/.cache/electron \
         -v ~/.cache/electron-builder:/root/.cache/electron-builder \
         electronuserland/builder:wine \
-        /bin/bash -c "yarn --link-duplicates --pure-lockfile && yarn dist"
+        /bin/bash -c "yarn --link-duplicates --pure-lockfile && yarn release -wl"
     else
-      yarn dist:current
+      yarn release
     fi
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 
-# branches:
-#   except:
-#     - "/^v\\d+\\.\\d+\\.\\d+$/"
+branches:
+  except:
+    - "/^v\\d+\\.\\d+\\.\\d+$/"
 
 # addons:
 #   apt:
