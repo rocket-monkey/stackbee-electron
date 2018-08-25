@@ -32,7 +32,7 @@ install:
 - nvm install 10.9.0
 - yarn
 script:
-- yarn run [ "$TRAVIS_OS_NAME" == "linux" ] && dist:current || dist
+- yarn '[ "$TRAVIS_OS_NAME" == "linux" ] && dist:current || dist'
 branches:
   except:
   - "/^v\\d+\\.\\d+\\.\\d+$/"
