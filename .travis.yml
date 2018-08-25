@@ -32,7 +32,6 @@ install:
 - nvm install 10.9.0
 - yarn
 script:
-- yarn run dist:current
 - yarn run [ "$TRAVIS_OS_NAME" == "linux" ] && dist:current || dist
 branches:
   except:
