@@ -1,7 +1,7 @@
 .vscode
 .next/
-renderer/.next/
-renderer/out
+app/renderer/.next/
+app/renderer/out
 _next/
 .idea/
 dist/
