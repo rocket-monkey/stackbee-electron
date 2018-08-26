@@ -4,7 +4,7 @@
   "description": "A specialized Electron application for the customers of stackbee.io",
   "main": "main/index.js",
   "scripts": {
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "electron-builder install-app-deps && ./scripts/fixHttpExecutor.sh",
     "start": "electron ./app",
     "dev": "cross-env NODE_ENV=development yarn start",
     "intl:pot": "react-intl-po json2pot './app/src/@lang/.messages/**/*.json' -o './app/src/@lang/messages.pot'",
