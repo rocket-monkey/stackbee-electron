@@ -27,13 +27,7 @@
     "publish": {
       "provider": "github",
       "owner": "rocket-monkey",
-      "vPrefixedTagName": true,
-      "host": "github.com",
-      "protocol": "https",
-      "private": false,
-      "private": false,
-      "releaseType": "draft",
-      "token": "5d7b919ca144ca0456351fe9da03aa33240e8a5e"
+      "vPrefixedTagName": true
     }
   },
   "repository": "https://github.com/rocket-monkey/stackbee-electron",
