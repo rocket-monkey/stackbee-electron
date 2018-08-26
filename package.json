@@ -10,7 +10,7 @@
     "intl:pot": "react-intl-po json2pot './app/src/@lang/.messages/**/*.json' -o './app/src/@lang/messages.pot'",
     "intl:json": "react-intl-po po2json './app/src/@lang/translations/messages.*.po' -m './app/src/@lang/.messages/**/*.json' -o './app/src/@lang/messages.json'",
     "build": "next build app/renderer && next export app/renderer",
-    "release": "cross-env NODE_ENV=production yarn run build && cross-env GH_TOKEN=5d7b919ca144ca0456351fe9da03aa33240e8a5e electron-builder build --x64 --ia32"
+    "release": "cross-env NODE_ENV=production yarn run build && electron-builder build --x64 --ia32"
   },
   "build": {
     "appId": "stackbee-electron",
