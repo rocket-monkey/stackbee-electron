@@ -14,6 +14,8 @@
   },
   "build": {
     "appId": "stackbee-electron",
+    "productName": "Stackbee.io App",
+    "copyright": "Copyright © 2018 stackbee.io",
     "files": [
       "**/*",
       "!app/renderer",
@@ -22,9 +24,17 @@
     "win": {
       "icon": "http://stackbee.io.app.s3.amazonaws.com/icon.ico"
     },
-    "publish": [
-      "github"
-    ]
+    "publish": {
+      "provider": "github",
+      "owner": "rocket-monkey",
+      "vPrefixedTagName": true,
+      "host": "github.com",
+      "protocol": "https",
+      "private": false,
+      "private": false,
+      "releaseType": "draft",
+      "token": "5d7b919ca144ca0456351fe9da03aa33240e8a5e"
+    }
   },
   "repository": "https://github.com/rocket-monkey/stackbee-electron",
   "bugs": {
