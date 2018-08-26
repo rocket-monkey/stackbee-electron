@@ -1,5 +1,5 @@
 {
-  "name": "stackbee.io",
+  "name": "stackbee-electron",
   "version": "0.0.1",
   "description": "A specialized Electron application for the customers of stackbee.io",
   "main": "main/index.js",

@@ -1,5 +1,5 @@
 {
-  "name": "stackbee.io",
+  "name": "stackbee-electron",
   "version": "0.0.1",
   "description": "A specialized Electron application for the customers of stackbee.io",
   "main": "main/index.js",
@@ -11,7 +11,7 @@
     "intl:json": "react-intl-po po2json './app/src/@lang/translations/messages.*.po' -m './app/src/@lang/.messages/**/*.json' -o './app/src/@lang/messages.json'",
     "build": "next build app/renderer && next export app/renderer",
     "prerelease": "./scripts/fixHttpExecutor.sh",
-    "release": "cross-env NODE_ENV=production yarn run build && electron-builder build --x64 --ia32"
+    "release": "cross-env NODE_ENV=production yarn run build && electron-builder build --x64"
   },
   "build": {
     "appId": "stackbee-electron",
