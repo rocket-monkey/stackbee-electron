@@ -35,3 +35,7 @@ To create a new release, update the version in ./package.json and ./app/package.
 # Create the executable for the current platform
 yarn dist
 ```
+
+### Workarounds
+
+* stupid collition with "url" module coming with next and "URL" class used in electron-builder's httpExecutor.ts -.-
