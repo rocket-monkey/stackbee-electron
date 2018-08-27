@@ -1,9 +1,10 @@
 import { Component, Fragment } from 'react'
 import classNames from 'class-names'
+import config from '@config'
 import WithKeyPress from '@decorators/withKeyPress'
 import { colors, spacings } from '@styles'
 
-const VISIBLE_PAGES = 5
+const VISIBLE_PAGES = config.paginatorVisiblePages
 
 class Paginator extends Component {
   prev = () => {

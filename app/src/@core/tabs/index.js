@@ -4,15 +4,18 @@ import { colors, spacings, fontSizes } from '@styles'
 
 class Navi extends Component {
   render() {
-    const { navi } = this.props
+    const { navi, active, disabled } = this.props
     return (
       <div className="navi">
         {navi.map((entry, index) => (
           <div
-            className={classNames('naviEntry', { 'active': index === this.props.active })}
+            className={classNames('naviEntry', {
+              'active': index === active,
+              'disabled': disabled
+            })}
             key={`tabs-navi-${index}`}
             onClick={() => {
-              this.props.setTabsState({ active: index  })
+              !disabled && this.props.setTabsState({ active: index  })
             }}
           >
             {entry[1]}
@@ -27,6 +30,10 @@ class Navi extends Component {
             width: 100%;
             background: linear-gradient(${colors.whiteAlpha25}, ${colors.whiteAlpha15});
             box-shadow: inset ${colors.yellowLightAlpha30} 0 1px 3px;
+          }
+
+          .disabled {
+            cursor: not-allowed !important;
           }
 
           .naviEntry {
@@ -71,18 +78,19 @@ class Content extends Component {
 
 export default class Tabs extends Component {
   state = {
-    active: 0
+    active: 0,
+    disabled: false
   }
 
   render() {
-    const { tabs } = this.props
-    const { active } = this.state
-    const navi = tabs.map(tab => [tab.id, tab.title])
-    const content = tabs[active].content
+    const { children } = this.props
+    const { active, disabled } = this.state
+    const navi = children.map(tab => [tab.id, tab.title])
+    const content = children[active].content(this.setState.bind(this))
     return (
       <div>
         <Content content={content} />
-        <Navi navi={navi} active={active} setTabsState={this.setState.bind(this)} />
+        <Navi navi={navi} active={active} disabled={disabled} setTabsState={this.setState.bind(this)} />
       </div>
     )
   }

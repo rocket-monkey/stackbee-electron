@@ -11,30 +11,31 @@ export default class Printers extends Component {
   render() {
     const { appState } = this.props
     return (
-      <Tabs
-        tabs={[
-          {
-            id: 0,
-            title: (
-              <div>
-                <FormattedMessage id='@app.printers.tabs.parse' defaultMessage='Parse' />
-                <H2Icon small><IconBookBookmarkLiteratureReadSchool /></H2Icon>
-              </div>
-            ),
-            content: <PrintersParse appState={appState} />
-          },
-          {
-            id: 1,
-            title: (
-              <div>
-                <FormattedMessage id='@app.printers.tabs.reports' defaultMessage='Reports' />
-                <H2Icon small><IconBookDetailInfoNotebookRead /></H2Icon>
-              </div>
-            ),
-            content: <PrintersReport appState={appState} />
-          }
-        ]}
-      />
+      <Tabs>
+        {[{
+          id: 0,
+          title: (
+            <div>
+              <FormattedMessage id='@app.printers.tabs.parse' defaultMessage='Parse' />
+              <H2Icon small><IconBookBookmarkLiteratureReadSchool /></H2Icon>
+            </div>
+          ),
+          content: (setTabState) => (
+            <PrintersParse appState={appState} setTabState={setTabState} />
+          )
+        }, {
+          id: 1,
+          title: (
+            <div>
+              <FormattedMessage id='@app.printers.tabs.reports' defaultMessage='Reports' />
+              <H2Icon small><IconBookDetailInfoNotebookRead /></H2Icon>
+            </div>
+          ),
+          content: (setTabState) => (
+            <PrintersReport appState={appState} setTabState={setTabState} />
+          )
+        }]}
+      </Tabs>
     )
   }
 }

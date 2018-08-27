@@ -27,9 +27,12 @@ class PrintersReport extends Component {
           !hasError &&
           <Grid
             fields={[
-              { cls: 'base', head: 'name', name: 'documentName', focus: true },
+              { cls: 'wide', head: 'name', name: 'documentName', focus: true },
               { cls: 'base', head: 'date', name: 'printDate', type: 'Date' },
               { cls: 'small', head: 'status', name: 'status' },
+              { cls: 'small', head: 'paper type', name: 'paperType' },
+              { cls: 'small', head: 'paper m2', name: 'paperUsedM2' },
+              { cls: 'small', head: 'copies', name: 'copies', type: 'Number' },
             ]}
             data={data}
             perPage={PER_PAGE}
@@ -53,9 +56,7 @@ class PrintersReport extends Component {
 
 export default WithFetch(({ page, sort }) => {
   const sortStr = sort && JSON.stringify(sort) || 'null'
-  return (
-    {
-      endpoint: `/csvdata?page=${page}&perPage=${PER_PAGE}&sort=${sortStr}`
-    }
-  )
+  return {
+    endpoint: `/csvdata?page=${page}&perPage=${PER_PAGE}&sort=${sortStr}`
+  }
 })(PrintersReport)

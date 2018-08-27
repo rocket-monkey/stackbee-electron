@@ -1,129 +1,15 @@
 import React, { Component, Fragment } from 'react'
 import { FormattedMessage } from 'react-intl'
 import classNames from 'class-names'
-import IconBookDetailInfoNotebookRead from '@icons/IconBookDetailInfoNotebookRead'
+import WithKeyPress from '@decorators/withKeyPress'
 import H2Icon from '@core/h2Icon'
-import Button from '@core/button'
-import Input from '@core/form/input'
 import Alert from '@core/alert'
+import EditForm from './editForm'
+import InfoPane from './infoPane'
+import Sortable from './sortable'
 import Paginator from '@core/paginator'
+import IconBookDetailInfoNotebookRead from '@icons/IconBookDetailInfoNotebookRead'
 import { colors, spacings, fontSizes, zIndexes } from '@styles'
-
-class EditForm extends Component {
-  formRef = React.createRef()
-
-  state = {
-    edit: -1,
-    refs: []
-  }
-
-  constructor(props) {
-    super(props)
-
-    this.addRef = this.addRef.bind(this)
-  }
-
-  addRef(element) {
-    if (!element) {
-      return
-    }
-    const { refs } = this.state
-
-    const filtered = refs.filter(ref => ref.name === element.name)
-    if (filtered.length > 0) {
-      return
-    }
-
-    refs.push(element)
-    this.setState({ refs })
-  }
-
-  handleSubmit = (event) => {
-    event.preventDefault()
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    if (props.edit !== state.edit) {
-      return { edit: props.edit }
-    }
-    return null
-  }
-
-  componentDidUpdate() {
-    const { docs = [] } = this.props
-    const { refs, edit } = this.state
-    const found = (docs || []).filter((doc, index) => index === edit)
-    if (!found.length) {
-      return
-    }
-
-    const data = found.pop()
-
-    refs.forEach(ref => {
-      if (ref.inputRef.current) {
-        const fieldName = ref.inputRef.current.name
-        ref.setValue(data[fieldName])
-      }
-    })
-  }
-
-  componentDidMount() {
-    this.setState({ edit: this.props.edit })
-  }
-
-  render() {
-    const { fields, loading, docs, edit } = this.props
-
-    if (!docs) {
-      return null
-    }
-
-    const found = docs.filter((doc, index) => index === edit)
-    const data = found.length && found.pop() || {}
-
-    return (
-      <Fragment>
-        <form ref={this.formRef} className={classNames({ 'active': edit > -1 && !loading })} onSubmit={this.handleSubmit.bind(this)}>
-          {fields.map((field, index) => {
-            const { type = 'String' } = field
-            switch (type) {
-              default:
-              case 'String':
-                return <Input key={`edit-form-element-${index}`} type="text" value={data[field.name]} name={field.name} inverted autoFocus={index === 0} label={`${field.name} [${type}]`} ref={element => this.addRef(element)} />
-            }
-          })}
-
-          <Button type="submit" primary floatRight>
-            <FormattedMessage id='@app.printer.editData.submit' defaultMessage='Save' />
-          </Button>
-        </form>
-
-        <style jsx>{`
-          form {
-            position: absolute;
-            top: 21px;
-            width: 50%;
-            bottom: 38px;
-            right: 0;
-            z-index: ${zIndexes.top};
-            background: linear-gradient(${colors.grayLightAlpha9}, ${colors.grayLightAlpha80});
-            transform: translateX(80%);
-            opacity: 0;
-            transition: all .5s ease;
-            padding: ${spacings.big} ${spacings.base};
-            border-left: 1px solid ${colors.grayAlpha20};
-            box-shadow: ${colors.grayAlpha40} -2px 1px 9px;
-          }
-
-          .active {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        `}</style>
-      </Fragment>
-    )
-  }
-}
 
 class RowFocus extends Component {
   inputRef = React.createRef()
@@ -152,115 +38,7 @@ class RowFocus extends Component {
   }
 }
 
-class InfoPane extends Component {
-  render() {
-    const { data, perPage = 0 } = this.props
-    const { page = 0, pages = 0, count = 0 } = data || {}
-
-    let displayEnd = page * perPage + perPage
-    if (data && displayEnd > data.count) {
-      displayEnd = data.count
-    }
-
-    return (
-      <Fragment>
-        <div>
-          {page * perPage + 1}&nbsp;-&nbsp;{displayEnd}&nbsp;/&nbsp;<span>{count}</span>
-        </div>
-
-        <style jsx>{`
-          div {
-            line-height: 38px;
-            float: right;
-            font-size: ${fontSizes.small};
-            font-weight: normal;
-            text-transform: initial;
-            font-style: italic;
-          }
-
-          span {
-            font-weight: bold;
-          }
-        `}</style>
-      </Fragment>
-    )
-  }
-}
-
-class Sortable extends Component {
-  render() {
-    const { data, field, setSort, loading } = this.props
-    const { sort = {} } = data || {}
-
-    const isSorted = sort[field]
-
-    return (
-      <Fragment>
-        <div
-          className={classNames({ 'loading': loading, 'desc': isSorted === 'desc', 'asc': isSorted === 'asc', 'notYet': !isSorted })}
-          onClick={() => {
-            setSort({ [field]: !isSorted || isSorted === 'desc' ? 'asc' : 'desc' })
-          }}
-        >
-          {isSorted && isSorted === 'asc' && <i className="up" />}
-          {isSorted && isSorted === 'desc' && <i className="down" />}
-          {!isSorted && <i className="up disabled" />}
-        </div>
-
-        <style jsx>{`
-          div {
-            display: inline-block;
-            position: relative;
-            top: 2px;
-          }
-
-          .asc {
-            cursor: s-resize;
-          }
-
-          .notYet {
-            cursor: n-resize;
-          }
-
-          .desc {
-            cursor: n-resize;
-          }
-
-          .loading {
-            cursor: inherit;
-          }
-
-          i {
-            border: solid ${colors.yellow};
-            border-width: 0 2px 2px 0;
-            display: inline-block;
-            padding: 2px;
-            float: right;
-          }
-
-          .up {
-            transform: rotate(-135deg) translateY(-4px) translateX(2px);
-            position: relative;
-            left: 4px;
-          }
-
-          .down {
-            transform: rotate(45deg);
-            cursor: n-resize;
-          }
-
-          .disabled {
-            border-color: ${colors.whiteAlpha35};
-          }
-        `}</style>
-      </Fragment>
-    )
-  }
-}
-
-let lastKeyCode = null
-
-export default class Grid extends Component {
+class Grid extends Component {
   bodyRef = React.createRef()
 
   state = {
@@ -268,19 +46,11 @@ export default class Grid extends Component {
     edit: -1
   }
 
-  constructor(props) {
-    super(props)
-
-    this.resetEdit = this.resetEdit.bind(this)
-    this.selectRow = this.selectRow.bind(this)
-    this.onKeyDown = this.onKeyDown.bind(this)
-  }
-
-  resetEdit() {
+  resetEdit = () => {
     this.setState({ edit: -1 })
   }
 
-  selectRow(index) {
+  selectRow = (index) => {
     if (index === this.state.focus) {
       return
     }
@@ -291,12 +61,11 @@ export default class Grid extends Component {
     }
   }
 
-  editRow(index) {
-    this.setState({ edit: index })
-    this.selectRow(index)
+  editRow = (index) => {
+    this.setState({ edit: index, focus: index })
   }
 
-  setFocus(event, index) {
+  setFocus = (event, index) => {
     if (index === this.state.focus) {
       return
     }
@@ -310,7 +79,7 @@ export default class Grid extends Component {
     this.setState({ focus: null })
   }
 
-  onKeyDown(event) {
+  onKeyDown = (event) => {
     const { loading, data, setPage } = this.props
     const { page = 0, pages = 0 } = data || {}
     const { code } = event
@@ -320,7 +89,7 @@ export default class Grid extends Component {
         if (this.state.edit > -1) {
           this.setState({ edit: -1 })
         }
-        return lastKeyCode = code
+        return this.props.saveLastKeyDown(code)
 
     }
   }
@@ -334,12 +103,13 @@ export default class Grid extends Component {
   }
 
   render() {
-    const { loading, data, perPage, fields } = this.props
+    const { loading, data, perPage, fields, editable = false } = this.props
     const { page = 0, pages = 0 } = data || {}
 
     return (
       <div className="table">
         {
+          editable &&
           this.state.edit > -1 &&
           <EditForm loading={loading} fields={fields} edit={this.state.edit} docs={data && data.docs} />
         }
@@ -424,7 +194,8 @@ export default class Grid extends Component {
           tbody {
             display: block;
             height: calc(100vh - 222px);
-            overflow: auto;
+            overflow-x: hidden;
+            overflow-y: auto;
             background: ${colors.whiteAlpha60};
             color: ${colors.dark};
             position: relative;
@@ -506,6 +277,11 @@ export default class Grid extends Component {
             font-size: ${fontSizes.small};
             line-height: 1.2rem;
             padding: ${spacings.tiny} ${spacings.small};
+            white-space: nowrap;
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
           }
 
           tr:nth-child(odd) :global(.focus) {
@@ -520,6 +296,7 @@ export default class Grid extends Component {
 
           tr {
             display: block;
+            white-space: nowrap;
             border-bottom: 1px solid ${colors.grayAlpha60};
           }
 
@@ -534,35 +311,37 @@ export default class Grid extends Component {
 
           .tiny,
           .small,
-          .base {
+          .base,
+          .wide {
             width: 180px;
             text-align: left;
           }
-          .tiny :global(span),
-          .small :global(span),
-          .base :global(span) {
-            display: inline-block;
-            width: 180px;
+          .tiny > :global(div),
+          .small > :global(div),
+          .base > :global(div),
+          .wide > :global(div) {
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
           }
+
           .tiny {
             font-weight: bold;
-            width: 38px;
-          }
-          .tiny :global(span) {
             font-size: ${fontSizes.tiny};
             width: 38px;
           }
-          .small {
+
+          .small{
             width: 90px;
           }
-          .small :global(span) {
-            width: 90px;
+
+          .wide{
+            width: 380px;
           }
         `}</style>
       </div>
     )
   }
 }
+
+export default WithKeyPress(Grid)

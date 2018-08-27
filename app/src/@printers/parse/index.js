@@ -39,20 +39,24 @@ export default class PrintersParse extends Component {
       const { files } = this.state
       files[fileName].meta.error = false
       this.setState({ isWorking: fileName, files })
+      this.props.setTabState({ disabled: true })
       const result = await parseData(fileName, fs.readFileSync(fileName, 'utf-8'), this.props.appState)
       const processed = (result.received && result.received) - (result.failedEntries && result.failedEntries.length)
       if (processed === (result.exists + result.saved)) {
         files[fileName].meta.processed = processed
         files[fileName].meta.failedEntries = result.failedEntries
         this.setState({ isWorking: false, files })
+        this.props.setTabState({ disabled: false  })
         // localStorage.setItem(fileName, JSON.stringify(files[fileName].meta))
       } else {
         files[fileName].meta.error = true
         this.setState({ isWorking: false, files })
+        this.props.setTabState({ disabled: false })
       }
     } catch (err) {
       console.error('Error ocurred!', err)
       this.setState({ isWorking: false })
+      this.props.setTabState({ disabled: false })
     }
   }
 
