@@ -11,8 +11,8 @@
     "intl:json": "react-intl-po po2json './app/src/@lang/translations/messages.*.po' -m './app/src/@lang/.messages/**/*.json' -o './app/src/@lang/messages.json'",
     "build": "next build app/renderer && next export app/renderer",
     "dist": "cross-env NODE_ENV=production yarn run build && electron-builder build",
-    "prerelease": "./scripts/fixHttpExecutor.sh",
-    "release": "cross-env NODE_ENV=production yarn run build && electron-builder build --x64"
+    "prerelease": "cross-env NODE_ENV=production yarn run build && rm -rf ./node_modules/url",
+    "release": "electron-builder build --x64"
   },
   "build": {
     "appId": "stackbee-electron",
