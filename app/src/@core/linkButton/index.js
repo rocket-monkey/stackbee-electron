@@ -10,7 +10,7 @@ export default class LinkButton extends Component {
     }
 
     const count = React.Children.count(children)
-    return React.isValidElement(children[0]) && count === 1
+    return React.isValidElement(children) && count === 1
   }
 
   onClick = (event) => {

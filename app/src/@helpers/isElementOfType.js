@@ -1,5 +1,7 @@
 import React from 'react'
 
+const debug = false
+
 export default (element, typeClass) => {
   if (!React.isValidElement(element)) {
     return false
@@ -19,12 +21,12 @@ export default (element, typeClass) => {
   const checkTypeClass = new typeClass({})
 
   if (!checkElement.getTypeStr) {
-    console.warn('@helpers/isElementOfType: element type has no "getTypeStr" method implemented!', element.type.name)
+    debug && console.warn('@helpers/isElementOfType: element type has no "getTypeStr" method implemented!', element.type.name)
     return false
   }
 
   if (!checkTypeClass.getTypeStr) {
-    console.warn('@helpers/isElementOfType: typeClass has no "getTypeStr" method implemented!', typeClass)
+    debug && console.warn('@helpers/isElementOfType: typeClass has no "getTypeStr" method implemented!', typeClass)
     return false
   }
 

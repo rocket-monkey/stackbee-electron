@@ -1,21 +1,12 @@
 import { Component, Fragment } from 'react'
 import classNames from 'class-names'
+import WithKeyPress from '@decorators/withKeyPress'
 import { colors, spacings } from '@styles'
 
 const VISIBLE_PAGES = 5
 
-let lastKeyCode = null
-
-export default class Paginator extends Component {
-  constructor(props) {
-    super(props)
-
-    this.prev = this.prev.bind(this)
-    this.next = this.next.bind(this)
-    this.onKeyDown = this.onKeyDown.bind(this)
-  }
-
-  prev() {
+class Paginator extends Component {
+  prev = () => {
     const { loading, data, setPage } = this.props
     if (loading) {
       return
@@ -26,7 +17,7 @@ export default class Paginator extends Component {
     page > 0 && setPage(newPage)
   }
 
-  next() {
+  next = () => {
     const { loading, data, setPage } = this.props
     if (loading) {
       return
@@ -37,7 +28,7 @@ export default class Paginator extends Component {
     page + 1 < pages && setPage(newPage)
   }
 
-  setPage(page) {
+  setPage = (page) => {
     const { loading, setPage, resetEdit } = this.props
     if (loading) {
       return
@@ -47,7 +38,21 @@ export default class Paginator extends Component {
     resetEdit()
   }
 
-  onKeyDown(event) {
+  saveLastKeyDown = (code) => {
+    lastKeyCode = code
+    lastKeyDownTstamp = new Date().getTime()
+  }
+
+  wasLastKeyCode = (code) => {
+    const timeDiff = new Date().getTime() - lastKeyDownTstamp
+    if (lastKeyCode === code && timeDiff < config.doubleKeyPressTolerance) {
+      return true
+    }
+
+    return false
+  }
+
+  onKeyDown = (event) => {
     const { loading, data, setPage } = this.props
     const { page = 0, pages = 0 } = data || {}
     const { code } = event
@@ -57,32 +62,32 @@ export default class Paginator extends Component {
         if (event.shiftKey) {
           this.next()
         }
-        return lastKeyCode = code
+        return this.props.saveLastKeyDown(code)
       case 'ArrowLeft':
         if (event.shiftKey) {
           this.prev()
         }
-        return lastKeyCode = code
+        return this.props.saveLastKeyDown(code)
       case 'ArrowUp':
         if (event.shiftKey) {
           this.props.bodyRef.scrollTo(0, 0)
         }
 
-        if (event.shiftKey && lastKeyCode === 'ArrowUp') {
+        if (event.shiftKey && this.props.wasLastKeyCodeEqualTo('ArrowUp')) {
           this.props.bodyRef.scrollTo(0, 0)
           this.setPage(0, true)
         }
-        return lastKeyCode = code
+        return this.props.saveLastKeyDown(code)
       case 'ArrowDown':
         if (event.shiftKey) {
           this.props.bodyRef.scrollTo(0, 999999)
         }
 
-        if (event.shiftKey && lastKeyCode === 'ArrowDown') {
+        if (event.shiftKey && this.props.wasLastKeyCodeEqualTo('ArrowDown')) {
           this.props.bodyRef.scrollTo(0, 999999)
           this.setPage(pages, true)
         }
-        return lastKeyCode = code
+        return this.props.saveLastKeyDown(code)
     }
   }
 
@@ -216,3 +221,5 @@ export default class Paginator extends Component {
     )
   }
 }
+
+export default WithKeyPress(Paginator)

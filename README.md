@@ -39,3 +39,8 @@ yarn dist
 ### Workarounds
 
 * stupid collition with "url" module coming with next and "URL" class used in electron-builder's httpExecutor.ts -.-
+
+### TODO's for proper release
+
+* solve code-signing for mac and win (MONEY -.-)
+* add autoUpdater functionality - test it trough on win/mac/linux! (https://www.electron.build/auto-update)

@@ -47,4 +47,4 @@ class Content extends Component {
   }
 }
 
-export default WithIntl(observer(Content))
+export default observer(WithIntl(Content))

@@ -296,14 +296,14 @@ export default class Grid extends Component {
     this.selectRow(index)
   }
 
-  setFocus(index) {
+  setFocus(event, index) {
     if (index === this.state.focus) {
       return
     }
     if (index) {
-      // TODO: only make on real focus event!
+      if (event && event.type === 'focus')
       return setTimeout(() => {
-        // this.setState({ focus: index  })
+        this.setState({ focus: index  })
       }, 10)
     }
 
@@ -337,8 +337,6 @@ export default class Grid extends Component {
     const { loading, data, perPage, fields } = this.props
     const { page = 0, pages = 0 } = data || {}
 
-    console.log('rerender', this.state.edit)
-
     return (
       <div className="table">
         {
@@ -367,7 +365,7 @@ export default class Grid extends Component {
               return (
                 <Fragment key={`csvdata-entry-${index}`}>
                   <tr className={classNames({ 'focus': this.state.focus === index || this.state.edit === index })} onClick={() => this.selectRow(index)} onDoubleClick={() => this.editRow(index)}>
-                    <td className="tiny"><span>{index + offset + 1}</span><RowFocus index={index} focus={this.state.focus} onFocus={() => this.setFocus(index)} onBlur={() => this.setFocus(null)} /></td>
+                    <td className="tiny"><span>{index + offset + 1}</span><RowFocus index={index} focus={this.state.focus} onFocus={(event) => this.setFocus(event, index)} onBlur={(event) => this.setFocus(event, null)} /></td>
                     {fields.map((field, index) => (
                       <td key={`content-${index}`} className={classNames(field.cls, { 'focus': field.focus })}>
                         <span>{doc[field.name]}</span>
