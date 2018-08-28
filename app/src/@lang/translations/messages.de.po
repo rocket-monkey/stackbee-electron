@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2018-08-19 07:40+0200\n"
+"POT-Creation-Date: 2018-08-28 23:32+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -12,73 +12,214 @@ msgstr ""
 "X-Generator: Poedit 1.8.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#. [@app.modules.printers.reportCreator.inactive]
+#. defaultMessage is:
+#. + Create Report
+#: app/src/@lang/.messages/app/src/@printers/report/reportWizard.json
+msgid "+ Create Report"
+msgstr "+ Bericht erstellen"
+
+#. [@app.adminLink.title] - Title for admin link button.
+#. defaultMessage is:
+#. Admin area
+#. [@app.adminLink.title] - Title for admin link button.
+#. defaultMessage is:
+#. Admin area
+#: app/src/@lang/.messages/app/src/@core/layout/adminLink.json
+#: app/src/@lang/.messages/src/@core/layout/adminLink.json
+msgid "Admin area"
+msgstr "Admin Bereich"
+
+#. [@app.modules.printers.reportCreator.active]
+#. defaultMessage is:
+#. Create Report:
+#: app/src/@lang/.messages/app/src/@printers/report/reportWizard.json
+msgid "Create Report:"
+msgstr "Bericht erstellen:"
+
+#. [@printers.parse.index.errorInfo]
+#. defaultMessage is:
+#. Error
+#. [@printers.parse.index.errorInfo]
+#. defaultMessage is:
+#. Error
+#: app/src/@lang/.messages/app/src/@printers/parse/index.json
+#: app/src/@lang/.messages/src/@printers/parse/index.json
+msgid "Error"
+msgstr "Fehler"
+
+#. [@app.error]
+#. defaultMessage is:
+#. Error ocurred!
+#. [@app.error]
+#. defaultMessage is:
+#. Error ocurred!
+#. [@app.error]
+#. defaultMessage is:
+#. Error ocurred!
+#: app/src/@lang/.messages/app/src/@printers/report/index.json
+#: app/src/@lang/.messages/app/src/@sites/home/moduleOverview.json
+#: app/src/@lang/.messages/src/@sites/home/moduleOverview.json
+msgid "Error ocurred!"
+msgstr "Fehler aufgetreten!"
+
+#. [@app.modules.printers.reportCreator.fromDate]
+#. defaultMessage is:
+#. From date
+#: app/src/@lang/.messages/app/src/@printers/report/reportWizard.json
+msgid "From date"
+msgstr "Datum von"
+
+#. [@printers.parse.index.failedInfo]
+#. defaultMessage is:
+#. Invalid
+#. [@printers.parse.index.invalid]
+#. defaultMessage is:
+#. Invalid
+#. [@printers.parse.index.failedInfo]
+#. defaultMessage is:
+#. Invalid
+#. [@printers.parse.index.invalid]
+#. defaultMessage is:
+#. Invalid
+#: app/src/@lang/.messages/app/src/@printers/parse/index.json
+#: app/src/@lang/.messages/src/@printers/parse/index.json
+msgid "Invalid"
+msgstr "Ungültig"
+
 #. [@app.login.success]
 #. defaultMessage is:
 #. Logged in successful!
-#: src/@lang/.messages/src/@core/loginRequired/index.json
+#. [@app.login.success]
+#. defaultMessage is:
+#. Logged in successful!
+#: app/src/@lang/.messages/app/src/@core/successError/index.json
+#: app/src/@lang/.messages/src/@core/successError/index.json
 msgid "Logged in successful!"
 msgstr "Erfolgreich angemeldet!"
 
 #. [@app.login.submit]
 #. defaultMessage is:
 #. Login
-#: src/@lang/.messages/src/@core/loginRequired/index.json
+#. [@app.login.submit]
+#. defaultMessage is:
+#. Login
+#: app/src/@lang/.messages/app/src/@core/loginRequired/index.json
+#: app/src/@lang/.messages/src/@core/loginRequired/index.json
 msgid "Login"
 msgstr "Anmelden"
 
 #. [@app.login.error]
 #. defaultMessage is:
 #. Login attempt failed
-#: src/@lang/.messages/src/@core/loginRequired/index.json
+#. [@app.login.error]
+#. defaultMessage is:
+#. Login attempt failed
+#: app/src/@lang/.messages/app/src/@core/successError/index.json
+#: app/src/@lang/.messages/src/@core/successError/index.json
 msgid "Login attempt failed"
 msgstr "Anmeldeversuch fehlgeschlagen"
 
-#. [@app.logout]
+#. [@app.userSettings.logout]
 #. defaultMessage is:
 #. Logout
-#: src/@lang/.messages/src/@core/layout/logout.json
+#. [@app.userSettings.logout]
+#. defaultMessage is:
+#. Logout
+#: app/src/@lang/.messages/app/src/@sites/userSettings/index.json
+#: app/src/@lang/.messages/src/@sites/userSettings/index.json
 msgid "Logout"
 msgstr "Abmelden"
 
 #. [@app.moduleOverview.title]
 #. defaultMessage is:
 #. Modules overview
-#: src/@lang/.messages/src/@sites/home/moduleOverview.json
+#. [@app.moduleOverview.title]
+#. defaultMessage is:
+#. Modules overview
+#: app/src/@lang/.messages/app/src/@sites/home/moduleOverview.json
+#: app/src/@lang/.messages/src/@sites/home/moduleOverview.json
 msgid "Modules overview"
 msgstr "Modul Übersicht"
 
 #. [@app.modules.owncloud]
 #. defaultMessage is:
 #. Nextcloud
-#: src/@lang/.messages/src/@sites/home/moduleOverview.json
+#. [@app.modules.owncloud]
+#. defaultMessage is:
+#. Nextcloud
+#: app/src/@lang/.messages/app/src/@sites/home/moduleOverview.json
+#: app/src/@lang/.messages/src/@sites/home/moduleOverview.json
 msgid "Nextcloud"
 msgstr "Nextcloud"
 
 #. [@printers.parse.index.open]
 #. defaultMessage is:
 #. Open File
-#: src/@lang/.messages/src/@printers/parse/index.json
+#. [@printers.parse.index.open]
+#. defaultMessage is:
+#. Open File
+#: app/src/@lang/.messages/app/src/@printers/parse/index.json
+#: app/src/@lang/.messages/src/@printers/parse/index.json
 msgid "Open File"
 msgstr "Datei öffnen"
+
+#. [@app.printers.tabs.parse]
+#. defaultMessage is:
+#. Parse
+#: app/src/@lang/.messages/app/src/@printers/index.json
+msgid "Parse"
+msgstr "Verarbeiten"
 
 #. [@printers.parse.index.parse]
 #. defaultMessage is:
 #. Parse File
-#: src/@lang/.messages/src/@printers/parse/index.json
+#. [@printers.parse.index.parse]
+#. defaultMessage is:
+#. Parse File
+#: app/src/@lang/.messages/app/src/@printers/parse/index.json
+#: app/src/@lang/.messages/src/@printers/parse/index.json
 msgid "Parse File"
-msgstr "verarbeiten"
+msgstr "Datei verarbeiten"
+
+#. [@app.modules.printers.parse]
+#. defaultMessage is:
+#. Parse printer CSV
+#. [@app.modules.printers.parse]
+#. defaultMessage is:
+#. Parse printer CSV
+#: app/src/@lang/.messages/app/src/@printers/parse/index.json
+#: app/src/@lang/.messages/src/@printers/parse/index.json
+msgid "Parse printer CSV"
+msgstr "Drucker CSV verarbeiten"
 
 #. [@app.login.password]
 #. defaultMessage is:
 #. Password
-#: src/@lang/.messages/src/@core/loginRequired/index.json
+#. [@app.userSettings.password]
+#. defaultMessage is:
+#. Password
+#. [@app.login.password]
+#. defaultMessage is:
+#. Password
+#. [@app.userSettings.password]
+#. defaultMessage is:
+#. Password
+#: app/src/@lang/.messages/app/src/@core/loginRequired/index.json
+#: app/src/@lang/.messages/app/src/@sites/userSettings/index.json
+#: app/src/@lang/.messages/src/@core/loginRequired/index.json
+#: app/src/@lang/.messages/src/@sites/userSettings/index.json
 msgid "Password"
 msgstr "Passwort"
 
 #. [@printers.parse.index.noFilesHint]
 #. defaultMessage is:
 #. Please open printer files first to proceed
-#: src/@lang/.messages/src/@printers/parse/index.json
+#. [@printers.parse.index.noFilesHint]
+#. defaultMessage is:
+#. Please open printer files first to proceed
+#: app/src/@lang/.messages/app/src/@printers/parse/index.json
+#: app/src/@lang/.messages/src/@printers/parse/index.json
 msgid "Please open printer files first to proceed"
 msgstr "Bitte zuerst Drucker-CSV-Dateien öffnen"
 
@@ -88,28 +229,118 @@ msgstr "Bitte zuerst Drucker-CSV-Dateien öffnen"
 #. [@app.modules.printers]
 #. defaultMessage is:
 #. Printer Mgmt
-#: src/@lang/.messages/src/@printers/parse/index.json
-#: src/@lang/.messages/src/@sites/home/moduleOverview.json
+#: app/src/@lang/.messages/app/src/@sites/home/moduleOverview.json
+#: app/src/@lang/.messages/src/@sites/home/moduleOverview.json
 msgid "Printer Mgmt"
 msgstr "Printer Mgmt"
+
+#. [@app.modules.printers.report]
+#. defaultMessage is:
+#. Printer reports
+#: app/src/@lang/.messages/app/src/@printers/report/index.json
+msgid "Printer reports"
+msgstr "Berichte"
 
 #. [@printers.parse.index.processedInfo]
 #. defaultMessage is:
 #. Processed
-#: src/@lang/.messages/src/@printers/parse/index.json
+#. [@printers.parse.index.processedInfo]
+#. defaultMessage is:
+#. Processed
+#: app/src/@lang/.messages/app/src/@printers/parse/index.json
+#: app/src/@lang/.messages/src/@printers/parse/index.json
 msgid "Processed"
 msgstr "Verarbeitet"
+
+#. [@app.printers.tabs.reports]
+#. defaultMessage is:
+#. Reports
+#: app/src/@lang/.messages/app/src/@printers/index.json
+msgid "Reports"
+msgstr "Berichte"
+
+#. [@app.printer.editData.submit]
+#. defaultMessage is:
+#. Save
+#. [@app.printer.editData.submit]
+#. defaultMessage is:
+#. Save
+#. [@app.userSettings.submit]
+#. defaultMessage is:
+#. Save
+#. [@app.userSettings.submit]
+#. defaultMessage is:
+#. Save
+#: app/src/@lang/.messages/app/src/@core/grid/editForm.json
+#: app/src/@lang/.messages/app/src/@core/grid/index.json
+#: app/src/@lang/.messages/app/src/@sites/userSettings/index.json
+#: app/src/@lang/.messages/src/@sites/userSettings/index.json
+msgid "Save"
+msgstr "Speichern"
+
+#. [@app.userSettings.title]
+#. defaultMessage is:
+#. User Settings
+#. [@app.userSettings.title]
+#. defaultMessage is:
+#. User Settings
+#: app/src/@lang/.messages/app/src/@sites/userSettings/index.json
+#: app/src/@lang/.messages/src/@sites/userSettings/index.json
+msgid "User Settings"
+msgstr "Benutzer Einstellungen"
+
+#. [@app.userSettingsLink.title] - Title for userSettings link button.
+#. defaultMessage is:
+#. User settings
+#. [@app.userSettingsLink.title] - Title for userSettings link button.
+#. defaultMessage is:
+#. User settings
+#: app/src/@lang/.messages/app/src/@core/layout/userSettings.json
+#: app/src/@lang/.messages/src/@core/layout/userSettings.json
+msgid "User settings"
+msgstr "Benutzer Einstellungen"
 
 #. [@app.login.username]
 #. defaultMessage is:
 #. Username
-#: src/@lang/.messages/src/@core/loginRequired/index.json
+#. [@app.userSettings.username]
+#. defaultMessage is:
+#. Username
+#. [@app.login.username]
+#. defaultMessage is:
+#. Username
+#. [@app.userSettings.username]
+#. defaultMessage is:
+#. Username
+#: app/src/@lang/.messages/app/src/@core/loginRequired/index.json
+#: app/src/@lang/.messages/app/src/@sites/userSettings/index.json
+#: app/src/@lang/.messages/src/@core/loginRequired/index.json
+#: app/src/@lang/.messages/src/@sites/userSettings/index.json
 msgid "Username"
 msgstr "Benutzername"
+
+#. [@app.input.validation.required] - Validation error for isRequired.
+#. defaultMessage is:
+#. Value cannot be empty
+#. [@app.input.validation.required] - Validation error for isRequired.
+#. defaultMessage is:
+#. Value cannot be empty
+#. [@app.input.validation.required] - Validation error for isRequired.
+#. defaultMessage is:
+#. Value cannot be empty
+#: app/src/@lang/.messages/app/src/@core/form/input.json
+#: app/src/@lang/.messages/app/src/@core/form/inputBase.json
+#: app/src/@lang/.messages/src/@core/form/input.json
+msgid "Value cannot be empty"
+msgstr "Wert ist erforderlich"
 
 #. [@app.offline]
 #. defaultMessage is:
 #. You are offline!
-#: src/@lang/.messages/src/@core/alert/index.json
+#. [@app.offline]
+#. defaultMessage is:
+#. You are offline!
+#: app/src/@lang/.messages/app/src/@core/alert/index.json
+#: app/src/@lang/.messages/src/@core/alert/index.json
 msgid "You are offline!"
 msgstr "Du bist offline!"

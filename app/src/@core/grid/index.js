@@ -327,8 +327,10 @@ class Grid extends Component {
 
           .tiny {
             font-weight: bold;
-            font-size: ${fontSizes.tiny};
             width: 38px;
+          }
+          .tiny :global(span) {
+            font-size: ${fontSizes.tiny};
           }
 
           .small{

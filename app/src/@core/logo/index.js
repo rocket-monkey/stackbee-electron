@@ -4,7 +4,7 @@ import IconStackbee from '@icons/IconStackbee'
 import { colors, spacings, fontSizes, zIndexes } from '@styles'
 
 export const LogoSmall = ({ sticker }) => (
-  <div title="stackbee.io" className={classNames({ 'sticker': sticker, 'nonSticker': !sticker })}>
+  <div title="home" className={classNames({ 'sticker': sticker, 'nonSticker': !sticker })}>
     {sticker && <Link href="/start"><IconStackbee /></Link>}
     {!sticker && <IconStackbee />}
 

@@ -1,6 +1,7 @@
 const path = require('path')
 const moduleResolver = require('babel-plugin-module-resolver')
 const reactIntl = require('babel-plugin-react-intl')
+const withCSS = require('@zeit/next-css')
 
 const resolverOptions = {
   "root": ["./app"],
@@ -21,7 +22,7 @@ const resolverOptions = {
 
 const internalNodeModulesRegExp = /src(?!\/(?!.*js))/
 
-module.exports = {
+module.exports = withCSS({
   webpack(config, { defaultLoaders, dev }) {
     // Allows you to load Electron modules and
     // native Node.js ones into your renderer
@@ -58,5 +59,5 @@ module.exports = {
       '/start': { page: '/start' }
     }
   }
-}
+})
 
