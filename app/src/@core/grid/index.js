@@ -103,8 +103,11 @@ class Grid extends Component {
   }
 
   render() {
-    const { loading, data, perPage, fields, editable = false } = this.props
+    const { loading, data, perPage, fields, offsetBottom = 0, editable = false } = this.props
     const { page = 0, pages = 0 } = data || {}
+
+    const tableStyleObj = offsetBottom > 0 ? { height: `calc(100vh - ${offsetBottom}px)` } : {}
+    const tbodyStyleObj = offsetBottom > 0 ? { height: `calc(100vh - ${offsetBottom + 22}px)` } : {}
 
     return (
       <div className="table">
@@ -114,7 +117,7 @@ class Grid extends Component {
           <EditForm loading={loading} fields={fields} edit={this.state.edit} docs={data && data.docs} />
         }
 
-        <table className={classNames({ 'loading': loading, 'splitView': this.state.edit > -1 })}>
+        <table style={tableStyleObj} className={classNames({ 'loading': loading, 'splitView': this.state.edit > -1 })}>
           <thead>
             <tr>
               <th className="tiny">#</th>
@@ -128,7 +131,7 @@ class Grid extends Component {
               ))}
             </tr>
           </thead>
-          <tbody ref={this.bodyRef}>
+          <tbody style={tbodyStyleObj} ref={this.bodyRef}>
             {(!loading && data && data.docs) && data.docs.map((doc, index) => {
               const offset = page * perPage
               const colSpan = fields.length + 1

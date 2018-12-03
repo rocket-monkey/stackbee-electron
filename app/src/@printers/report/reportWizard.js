@@ -1,6 +1,7 @@
 import { PureComponent, Fragment } from 'react'
 import { FormattedMessage } from 'react-intl'
 import classNames from 'class-names'
+import FieldSet from '@core/form/fieldSet'
 import Form from '@core/form'
 import DatePicker from '@core/form/datePicker'
 import { colors, spacings, fontSizes } from '@styles'
@@ -21,8 +22,11 @@ class ReportCreator extends PureComponent {
 
         <Form>
           {(isValid, loading, resetForm, getFieldRef) => (
-            <Fragment>
-              <DatePicker name="fromDate" label={<FormattedMessage id='@app.modules.printers.reportCreator.fromDate' defaultMessage='From date' />} />
+            <Fragment sideBySide>
+              <FieldSet>
+                <DatePicker name="fromDate" label={<FormattedMessage id='@app.modules.printers.reportCreator.fromDate' defaultMessage='From date' />} />
+                <DatePicker name="toDate" label={<FormattedMessage id='@app.modules.printers.reportCreator.toDate' defaultMessage='To date' />} />
+              </FieldSet>
             </Fragment>
           )}
         </Form>
@@ -30,6 +34,7 @@ class ReportCreator extends PureComponent {
         <style jsx>{`
           .title {
             font-size: ${fontSizes.tiny};
+            margin-right: ${spacings.base};
           }
         `}</style>
       </Fragment>

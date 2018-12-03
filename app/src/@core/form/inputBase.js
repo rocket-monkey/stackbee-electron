@@ -19,7 +19,7 @@ export default class InputBase extends PureComponent {
     this.inputRef = React.createRef()
   }
 
-  getTypeStr = () => 'FormInput'
+  getTypeStr = () => 'InputBase'
 
   getMessages = (key) => messages[key]
 

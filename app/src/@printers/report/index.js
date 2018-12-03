@@ -46,7 +46,7 @@ class PrintersReport extends Component {
             setPage={this.props.setPage}
             setSort={this.props.setSort}
             loading={loading}
-            offsetBottom={this.state.createReportActive ? 150 : 0}
+            offsetBottom={this.state.createReportActive ? 300 : 0}
           />
         }
 

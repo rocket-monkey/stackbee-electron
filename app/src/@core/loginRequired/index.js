@@ -101,7 +101,7 @@ class LoginRequired extends Component {
           </h2>
 
           <div className={classNames({ 'offline': offline })}>
-            <Form onSubmit={this.handleSubmit.bind(this)}>
+            <Form onSubmit={this.handleSubmit.bind(this)} fullScreen>
               {(isValid, loading, resetForm, getFieldRef) => (
                 <Fragment>
                   <Input type="text" name="username" isRequired autoFocus label={<FormattedMessage id='@app.login.username' defaultMessage='Username' />} disabled={success || loading || offline} />
