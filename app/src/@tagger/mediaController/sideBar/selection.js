@@ -94,15 +94,20 @@ export default class Selection extends Component {
           div {
             position: fixed;
             top: 44px;
-            right: 260px;
+            right: 300px;
           }
 
           ul {
-            opacity: .8;
-            background: ${colors.blueTurky};
+            opacity: .3;
+            transition: opacity .4s;
+            background: ${colors.grayLight};
             padding: 0;
             max-height: calc(100vh - 182px);
             overflow-y: auto;
+          }
+
+          ul:hover {
+            opacity: 1;
           }
 
           li {

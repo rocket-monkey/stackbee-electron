@@ -2,6 +2,7 @@ export default {
   bright: 'rgba(255, 255, 255, .7)',
   dark: 'rgba(0, 0, 0, .7)',
   content: '#ddd',
+  white: 'rgba(255, 255, 255, 1)',
   whiteAlpha15: 'rgba(255, 255, 255, .15)',
   whiteAlpha25: 'rgba(255, 255, 255, .25)',
   whiteAlpha60: 'rgba(255, 255, 255, .6)',

@@ -39,7 +39,11 @@ export default class MeasureMedias extends Component {
 
   componentDidMount() {
     if (!this.state.media) {
-      this.setState({ media: this.state.medias[this.state.medias.length - 1] })
+      let lastOne = this.state.medias.pop()
+      while (!isVideo(lastOne) && !isImage(lastOne)) {
+        lastOne = this.state.medias.pop()
+      }
+      this.setState({ media: lastOne })
     }
   }
 
@@ -48,9 +52,16 @@ export default class MeasureMedias extends Component {
   }
 
   goToNext = () => {
-    const medias = this.state.medias
-    medias.pop()
-    this.setState({ media: medias[medias.length - 1], medias })
+    const { medias } = this.state
+    if (medias.length > 1) {
+      const lastOne = medias.pop()
+      if (!isVideo(lastOne) && !isImage(lastOne)) {
+        return this.goToNext()
+      }
+      this.setState({ media: lastOne, medias })
+    } else {
+      console.log('wtf', this.state)
+    }
   }
 
   handleOnLoad () {
@@ -90,11 +101,6 @@ export default class MeasureMedias extends Component {
     const { media } = this.state
 
     if (!media) {
-      return null
-    }
-
-    if (!isVideo(media) && !isImage(media)) {
-      this.goToNext()
       return null
     }
 

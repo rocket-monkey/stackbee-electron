@@ -21,6 +21,7 @@ export default class SideBar extends Component {
 
     this.unmarkNew = this.unmarkNew.bind(this)
     this.handleTagClick = this.handleTagClick.bind(this)
+    this.handleTagRemoval = this.handleTagRemoval.bind(this)
   }
 
   handleSubmit = (values) => {
@@ -52,6 +53,17 @@ export default class SideBar extends Component {
     this.props.handleTagClick(active)
   }
 
+  handleTagRemoval = (e) => {
+    e.preventDefault()
+    const { active } = this.state
+    this.props.api
+      .post('/taggerKillTags', active)
+      .then(res => res.json && res.json() || {})
+      .then(json => {
+        location.reload()
+      })
+  }
+
   render () {
     const { appState, folderPath, selected } = this.props
     const { tags, active } = this.state
@@ -65,14 +77,15 @@ export default class SideBar extends Component {
 
     const hasOneFilter = active.length === 1
     const onlyNewFiltered = active.filter(a => a.name === 'new').length && hasOneFilter
+    const validSelection = active.filter(a => a.type !== 'special').length
 
     return (
       <div className="sideBar">
         <div className="title"><i>"{folderPath}" ({this.props.medias.length})</i></div>
-        <Button onClick={() => { this.props.updateTaggerState({ activeFolder: null }) }}>{'<'}</Button>
-        <Button disabled={!onlyNewFiltered} onClick={this.unmarkNew}>{'!New'}</Button>
+        <Button onClick={() => { this.props.updateTaggerState({ activeFolder: null }) }}>Back</Button>
+        <Button disabled={!onlyNewFiltered} onClick={this.unmarkNew}>!New</Button>
 
-        <TagList tags={finalTags} medias={this.props.medias} handleTagClick={this.handleTagClick} updateController={this.props.updateController} spreadTag={this.props.spreadTag} matchSpecialFilter={this.props.matchSpecialFilter} />
+        <TagList tags={finalTags} medias={this.props.medias} handleTagClick={this.handleTagClick} updateController={this.props.updateController} spreadTag={this.props.spreadTag} matchSpecialFilter={this.props.matchSpecialFilter} api={this.props.api} />
         <Selection appState={appState} folderPath={folderPath} selected={selected} addSelection={this.props.addSelection} selectionPath={this.props.selectionPath} updateTaggerState={this.props.updateTaggerState} />
 
         <Form onSubmit={this.handleSubmit.bind(this)}>
@@ -81,6 +94,7 @@ export default class SideBar extends Component {
               <Input type="text" name="tag" placeholder="Tag name" />
 
               <Button type="submit" primary disabled={loading}>+</Button>
+              <Button type="submit" primary disabled={!validSelection} onClick={this.handleTagRemoval}>-</Button>
             </>
           )}
         </Form>
