@@ -16,6 +16,7 @@ const resolverOptions = {
     "@helpers": "./app/src/@helpers",
     "@icons": "./app/src/@icons",
     "@printers": "./app/src/@printers",
+    "@tagger": "./app/src/@tagger",
     "@styles": "./app/src/@styles"
   }
 }

@@ -6,7 +6,9 @@
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
     "start": "electron ./app",
+    "start:tagger": "electron ./app --allow-file-access-from-files",
     "dev": "cross-env NODE_ENV=development yarn start",
+    "dev:tagger": "cross-env NODE_ENV=development yarn start:tagger",
     "intl:pot": "react-intl-po json2pot './app/src/@lang/.messages/**/*.json' -o './app/src/@lang/messages.pot'",
     "intl:json": "react-intl-po po2json './app/src/@lang/translations/messages.*.po' -m './app/src/@lang/.messages/**/*.json' -o './app/src/@lang/messages.json'",
     "build": "next build app/renderer && next export app/renderer",
